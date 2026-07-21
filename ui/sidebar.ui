@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0"/>
+	<requires lib="libadwaita" version="1.0"/>
+	<template class="SidebarView" parent="GtkBox">
+		<property name="orientation">vertical</property>
+		<property name="hexpand">True</property>
+		<property name="vexpand">True</property>
+		<child>
+			<object class="GtkListBox" id="nav_list">
+				<property name="selection-mode">single</property>
+				<property name="margin-top">12</property>
+				<property name="margin-start">12</property>
+				<property name="margin-end">12</property>
+				<style>
+					<class name="navigation-sidebar"/>
+				</style>
+				<child>
+					<object class="GtkListBoxRow" id="row_home">
+						<property name="name">home</property>
+						<child>
+							<object class="GtkBox">
+								<property name="orientation">horizontal</property>
+								<property name="spacing">12</property>
+								<property name="margin-top">10</property>
+								<property name="margin-bottom">10</property>
+								<property name="margin-start">10</property>
+								<property name="margin-end">10</property>
+								<child>
+									<object class="GtkImage">
+										<property name="icon-name">go-home-symbolic</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkLabel">
+										<property name="label" translatable="yes">Home</property>
+										<style>
+											<class name="heading"/>
+										</style>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+				<child>
+					<object class="GtkListBoxRow" id="row_explore">
+						<property name="name">explore</property>
+						<child>
+							<object class="GtkBox">
+								<property name="orientation">horizontal</property>
+								<property name="spacing">12</property>
+								<property name="margin-top">10</property>
+								<property name="margin-bottom">10</property>
+								<property name="margin-start">10</property>
+								<property name="margin-end">10</property>
+								<child>
+									<object class="GtkImage">
+										<property name="icon-name">system-search-symbolic</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkLabel">
+										<property name="label" translatable="yes">Explore</property>
+										<style>
+											<class name="heading"/>
+										</style>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+				<child>
+					<object class="GtkListBoxRow" id="row_library">
+						<property name="name">library</property>
+						<child>
+							<object class="GtkBox">
+								<property name="orientation">horizontal</property>
+								<property name="spacing">12</property>
+								<property name="margin-top">10</property>
+								<property name="margin-bottom">10</property>
+								<property name="margin-start">10</property>
+								<property name="margin-end">10</property>
+								<child>
+									<object class="GtkImage">
+										<property name="icon-name">folder-music-symbolic</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkLabel">
+										<property name="label" translatable="yes">Library</property>
+										<style>
+											<class name="heading"/>
+										</style>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</child>
+		<child>
+			<object class="GtkBox">
+				<property name="orientation">vertical</property>
+				<property name="vexpand">True</property>
+				<property name="valign">end</property>
+				<property name="margin-bottom">12</property>
+				<property name="margin-start">12</property>
+				<property name="margin-end">12</property>
+				<child>
+					<object class="GtkButton" id="btn_login">
+						<signal name="clicked" handler="on_login_clicked"/>
+						<property name="label">Log In</property>
+						<property name="icon-name">avatar-default-symbolic</property>
+						<style>
+							<class name="pill"/>
+						</style>
+					</object>
+				</child>
+			</object>
+		</child>
+	</template>
+</interface>

@@ -1,0 +1,53 @@
+.rounded-cover {
+    border-radius: 6px;
+}
+
+.artist-header-gradient {
+    background: linear-gradient(to bottom, transparent 0%, @window_bg_color 90%, @window_bg_color 100%);
+}
+
+.sidebar-border {
+    border-right: 1px solid alpha(currentColor, 0.05);
+}
+
+.ytm-timeline {
+    padding: 0;
+    margin: 0;
+}
+
+.ytm-timeline trough {
+    min-height: 2px;
+    background-color: alpha(currentColor, 0.1);
+    border-radius: 0;
+    margin: 0;
+}
+
+.ytm-timeline highlight {
+    background-color: @accent_color;
+    border-radius: 0;
+}
+
+.ytm-timeline slider {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.active-queue-row {
+    border-left: 4px solid @accent_bg_color;
+    background-color: alpha(@accent_bg_color, 0.1);
+}
+
+.compact-switcher button {
+    min-width: 20px;
+    padding: 2px 4px;
+}
+
+.compact-switcher button label {
+    font-size: 0.9em;
+}

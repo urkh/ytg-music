@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0" />
+	<requires lib="libadwaita" version="1.0" />
+	<template class="ArtistView" parent="GtkOverlay">
+		<property name="hexpand">True</property>
+		<property name="vexpand">True</property>
+		<property name="child">
+			<object class="GtkScrolledWindow" id="content_box">
+				<property name="hexpand">True</property>
+				<property name="vexpand">True</property>
+				<property name="hscrollbar-policy">never</property>
+				<property name="vscrollbar-policy">automatic</property>
+				<child>
+					<object class="GtkBox">
+						<property name="orientation">vertical</property>
+						<child>
+							<object class="GtkOverlay">
+								<property name="height-request">350</property>
+								<property name="child">
+									<object class="GtkPicture" id="img_cover">
+										<property name="can-shrink">True</property>
+										<property name="content-fit">cover</property>
+									</object>
+								</property>
+								<child type="overlay">
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="valign">end</property>
+										<property name="hexpand">True</property>
+										<style>
+											<class name="artist-header-gradient" />
+										</style>
+										<child>
+											<object class="AdwClamp">
+												<property name="maximum-size">1000</property>
+												<property name="tightening-threshold">600</property>
+												<child>
+													<object class="GtkBox">
+														<property name="orientation">vertical</property>
+														<property name="margin-start">24</property>
+														<property name="margin-end">24</property>
+														<property name="margin-bottom">48</property>
+														<property name="margin-top">100</property>
+														<property name="spacing">4</property>
+														<child>
+															<object class="GtkLabel" id="lbl_artist_name">
+																<property name="label">Loading...</property>
+																<property name="halign">start</property>
+																<property name="wrap">True</property>
+																<style>
+																	<class name="title-1" />
+																</style>
+															</object>
+														</child>
+														<child>
+															<object class="GtkBox">
+																<property name="orientation">horizontal</property>
+																<property name="spacing">16</property>
+																<property name="valign">center</property>
+																<child>
+																	<object class="GtkLabel" id="lbl_subscribers">
+																		<property name="label" />
+																		<property name="halign">start</property>
+																		<style>
+																			<class name="dim-label" />
+																		</style>
+																	</object>
+																</child>
+																<child>
+																	<object class="GtkButton" id="btn_subscribe">
+																		<property name="label" translatable="yes">Subscribe</property>
+																		<property name="valign">center</property>
+																		<property name="visible">False</property>
+																		<style>
+																			<class name="pill" />
+																		</style>
+																	</object>
+																</child>
+															</object>
+														</child>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</child>
+						<child>
+							<object class="AdwClamp">
+								<property name="maximum-size">1000</property>
+								<property name="tightening-threshold">600</property>
+								<child>
+									<object class="GtkBox" id="artist_box">
+										<property name="orientation">vertical</property>
+										<property name="spacing">32</property>
+										<property name="margin-start">24</property>
+										<property name="margin-end">24</property>
+										<property name="margin-top">0</property>
+										<property name="margin-bottom">100</property>
+										<child>
+											<object class="GtkBox">
+												<property name="orientation">vertical</property>
+												<property name="spacing">4</property>
+												<child>
+													<object class="GtkLabel" id="lbl_description">
+														<property name="label" />
+														<property name="use-markup">True</property>
+														<property name="wrap">True</property>
+														<property name="halign">start</property>
+														<style>
+															<class name="dim-label" />
+														</style>
+													</object>
+												</child>
+												<child>
+													<object class="GtkToggleButton" id="btn_toggle_description">
+														<property name="label" translatable="yes">Show more</property>
+														<property name="halign">start</property>
+														<property name="visible">False</property>
+														<property name="margin-top">16</property>
+														<style>
+															<class name="flat" />
+														</style>
+														<style>
+															<class name="dim-label" />
+														</style>
+													</object>
+												</child>
+											</object>
+										</child>
+										<child>
+											<object class="GtkBox">
+												<property name="orientation">vertical</property>
+												<property name="spacing">12</property>
+												<child>
+													<object class="GtkLabel">
+														<property name="label" translatable="yes">Top Songs</property>
+														<property name="halign">start</property>
+														<style>
+															<class name="title-2" />
+														</style>
+													</object>
+												</child>
+												<child>
+													<object class="GtkListBox" id="list_top_songs">
+														<property name="selection-mode">none</property>
+														<style>
+															<class name="boxed-list" />
+														</style>
+													</object>
+												</child>
+											</object>
+										</child>
+										<child>
+											<object class="GtkBox">
+												<property name="orientation">vertical</property>
+												<property name="spacing">12</property>
+												<child>
+													<object class="GtkLabel">
+														<property name="label" translatable="yes">Albums</property>
+														<property name="halign">start</property>
+														<style>
+															<class name="title-2" />
+														</style>
+													</object>
+												</child>
+												<child>
+													<object class="GtkFlowBox" id="flow_albums">
+														<property name="selection-mode">none</property>
+														<property name="max-children-per-line">10</property>
+														<property name="min-children-per-line">2</property>
+														<property name="column-spacing">16</property>
+														<property name="row-spacing">16</property>
+														<property name="homogeneous">True</property>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</property>
+		<child type="overlay">
+			<object class="GtkSpinner" id="spinner">
+				<property name="halign">center</property>
+				<property name="valign">center</property>
+				<property name="width-request">48</property>
+				<property name="height-request">48</property>
+			</object>
+		</child>
+	</template>
+</interface>

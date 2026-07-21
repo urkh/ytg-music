@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0"/>
+	<requires lib="libadwaita" version="1.0"/>
+	<template class="LoginDialog" parent="AdwWindow">
+		<signal name="close-request" handler="on_close_request"/>
+		<property name="modal">True</property>
+		<property name="hide-on-close">True</property>
+		<property name="default-width">450</property>
+		<property name="default-height">350</property>
+		<property name="title">Vincular con YouTube Music</property>
+		<property name="content">
+			<object class="GtkBox">
+				<property name="orientation">vertical</property>
+				<child>
+					<object class="AdwHeaderBar">
+						<property name="show-end-title-buttons">True</property>
+						<property name="show-start-title-buttons">False</property>
+					</object>
+				</child>
+				<child>
+					<object class="GtkBox" id="content_box">
+						<property name="orientation">vertical</property>
+						<property name="valign">center</property>
+						<property name="halign">center</property>
+						<property name="spacing">24</property>
+						<property name="margin-top">24</property>
+						<property name="margin-bottom">24</property>
+						<property name="margin-start">24</property>
+						<property name="margin-end">24</property>
+						<property name="vexpand">True</property>
+						<child>
+							<object class="GtkImage">
+								<property name="icon-name">avatar-default-symbolic</property>
+								<property name="pixel-size">64</property>
+								<style>
+									<class name="dim-label"/>
+								</style>
+							</object>
+						</child>
+						<child>
+							<object class="GtkLabel" id="lbl_instructions">
+								<property name="label">To log in, make sure you are logged into YouTube Music in your primary browser.</property>
+								<property name="wrap">True</property>
+								<property name="justify">center</property>
+								<property name="max-width-chars">40</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkButton" id="btn_extract_cookies">
+								<signal name="clicked" handler="on_extract_clicked"/>
+								<property name="label">Extract YouTube Music Session</property>
+								<property name="margin-top">16</property>
+								<style>
+									<class name="suggested-action"/>
+									<class name="pill"/>
+								</style>
+							</object>
+						</child>
+						<child>
+							<object class="GtkSpinner" id="spinner">
+								<property name="margin-top">16</property>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</property>
+	</template>
+</interface>

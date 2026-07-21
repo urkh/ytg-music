@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0"/>
+	<requires lib="libadwaita" version="1.0"/>
+	<template class="PlayerView" parent="GtkBox">
+		<property name="orientation">vertical</property>
+		<property name="hexpand">True</property>
+		<style>
+			<class name="background"/>
+		</style>
+		<child>
+			<object class="GtkScale" id="timeline_slider">
+				<property name="orientation">horizontal</property>
+				<property name="hexpand">True</property>
+				<property name="draw-value">False</property>
+				<property name="margin-top">0</property>
+				<property name="margin-bottom">0</property>
+				<style>
+					<class name="ytm-timeline"/>
+				</style>
+			</object>
+		</child>
+		<child>
+			<object class="GtkBox">
+				<property name="orientation">horizontal</property>
+				<property name="hexpand">True</property>
+				<property name="margin-start">24</property>
+				<property name="margin-end">24</property>
+				<property name="margin-top">8</property>
+				<property name="margin-bottom">12</property>
+				<property name="spacing">16</property>
+				<child>
+					<object class="GtkBox">
+						<property name="orientation">horizontal</property>
+						<property name="halign">start</property>
+						<property name="spacing">8</property>
+						<child>
+							<object class="GtkButton" id="btn_prev">
+								<signal name="clicked" handler="on_prev_clicked"/>
+								<property name="icon-name">media-skip-backward-symbolic</property>
+								<property name="valign">center</property>
+								<style>
+									<class name="circular"/>
+									<class name="flat"/>
+								</style>
+							</object>
+						</child>
+						<child>
+							<object class="GtkButton" id="btn_play">
+								<signal name="clicked" handler="on_play_clicked"/>
+								<property name="icon-name">media-playback-start-symbolic</property>
+								<property name="valign">center</property>
+								<property name="width-request">48</property>
+								<property name="height-request">48</property>
+								<style>
+									<class name="circular"/>
+									<class name="flat"/>
+								</style>
+							</object>
+						</child>
+						<child>
+							<object class="GtkButton" id="btn_next">
+								<signal name="clicked" handler="on_next_clicked"/>
+								<property name="icon-name">media-skip-forward-symbolic</property>
+								<property name="valign">center</property>
+								<style>
+									<class name="circular"/>
+									<class name="flat"/>
+								</style>
+							</object>
+						</child>
+						<child>
+							<object class="GtkLabel" id="time_label">
+								<property name="valign">center</property>
+								<property name="margin-start">16</property>
+								<style>
+									<class name="numeric"/>
+									<class name="dim-label"/>
+								</style>
+							</object>
+						</child>
+					</object>
+				</child>
+				<child>
+					<object class="GtkBox">
+						<property name="orientation">horizontal</property>
+						<property name="spacing">16</property>
+						<property name="hexpand">True</property>
+						<property name="halign">center</property>
+						<child>
+							<object class="GtkBox">
+								<property name="orientation">horizontal</property>
+								<property name="spacing">4</property>
+								<property name="valign">center</property>
+								<property name="margin-end">8</property>
+								<child>
+									<object class="GtkButton" id="btn_like">
+										<signal name="clicked" handler="on_like_clicked"/>
+										<property name="tooltip-text" translatable="yes">Like</property>
+										<style>
+											<class name="circular"/>
+											<class name="flat"/>
+										</style>
+										<child>
+											<object class="GtkImage" id="img_like">
+												<property name="file">assets/thumb-like.svg</property>
+												<property name="pixel-size">24</property>
+											</object>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkButton" id="btn_dislike">
+										<signal name="clicked" handler="on_dislike_clicked"/>
+										<property name="tooltip-text" translatable="yes">Dislike</property>
+										<style>
+											<class name="circular"/>
+											<class name="flat"/>
+										</style>
+										<child>
+											<object class="GtkImage" id="img_dislike">
+												<property name="file">assets/thumb-dislike.svg</property>
+												<property name="pixel-size">24</property>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</child>
+						<child>
+							<object class="GtkImage" id="img_cover">
+								<property name="pixel-size">48</property>
+								<property name="icon-name">audio-x-generic-symbolic</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkBox">
+								<property name="orientation">vertical</property>
+								<property name="valign">center</property>
+								<child>
+									<object class="GtkLabel" id="lbl_title">
+										<property name="label" translatable="yes">Unknown</property>
+										<property name="halign">start</property>
+										<property name="ellipsize">end</property>
+										<property name="max-width-chars">40</property>
+										<style>
+											<class name="heading"/>
+										</style>
+									</object>
+								</child>
+								<child>
+									<object class="GtkLabel" id="lbl_artist">
+										<property name="label" translatable="yes">Unknown Artist</property>
+										<property name="halign">start</property>
+										<property name="use-markup">True</property>
+										<property name="ellipsize">end</property>
+										<property name="max-width-chars">40</property>
+										<style>
+											<class name="dim-label"/>
+										</style>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+				<child>
+					<object class="GtkBox">
+						<property name="orientation">horizontal</property>
+						<property name="spacing">4</property>
+						<property name="halign">end</property>
+						<property name="valign">center</property>
+						<child>
+							<object class="GtkScale" id="scale_volume">
+								<signal name="value-changed" handler="on_volume_changed"/>
+								<property name="orientation">horizontal</property>
+								<property name="draw-value">False</property>
+								<property name="width-request">100</property>
+								<property name="valign">center</property>
+								<property name="margin-end">4</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkButton" id="btn_volume">
+								<signal name="clicked" handler="on_volume_clicked"/>
+								<property name="icon-name">audio-volume-high-symbolic</property>
+								<style>
+									<class name="flat"/>
+									<class name="circular"/>
+								</style>
+								<property name="margin-end">16</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkToggleButton" id="btn_shuffle">
+								<signal name="toggled" handler="on_shuffle_toggled"/>
+								<property name="icon-name">media-playlist-shuffle-symbolic</property>
+								<style>
+									<class name="flat"/>
+									<class name="circular"/>
+								</style>
+							</object>
+						</child>
+						<child>
+							<object class="GtkToggleButton" id="btn_repeat">
+								<signal name="toggled" handler="on_repeat_toggled"/>
+								<property name="icon-name">media-playlist-repeat-symbolic</property>
+								<style>
+									<class name="flat"/>
+									<class name="circular"/>
+								</style>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</child>
+	</template>
+</interface>

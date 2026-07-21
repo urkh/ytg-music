@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0" />
+	<requires lib="libadwaita" version="1.0" />
+	<template class="MainWindow" parent="AdwApplicationWindow">
+		<property name="default-width">1100</property>
+		<property name="default-height">750</property>
+		<property name="title">YouTube Music</property>
+		<property name="content">
+			<object class="GtkBox">
+				<property name="orientation">vertical</property>
+				<child>
+					<object class="AdwHeaderBar">
+						<child type="start">
+							<object class="GtkButton" id="btn_toggle_sidebar">
+								<signal name="clicked" handler="on_toggle_sidebar_clicked"/>
+								<property name="icon-name">open-menu-symbolic</property>
+								<property name="tooltip-text">Toggle Sidebar</property>
+								<style>
+									<class name="flat" />
+								</style>
+							</object>
+						</child>
+						<child type="start">
+							<object class="GtkButton" id="btn_back">
+								<signal name="clicked" handler="on_back_clicked"/>
+								<property name="icon-name">go-previous-symbolic</property>
+								<property name="visible">False</property>
+								<style>
+									<class name="flat" />
+								</style>
+							</object>
+						</child>
+						<child type="title">
+							<object class="GtkSearchEntry" id="main_search_entry">
+								<signal name="activate" handler="on_search_activate"/>
+								<property name="placeholder-text">Search songs, artists...</property>
+								<property name="width-request">400</property>
+							</object>
+						</child>
+						<child type="end">
+							<object class="GtkBox" id="header_queue_switcher_container">
+								<property name="visible">True</property>
+								<property name="valign">center</property>
+								<property name="margin-end">8</property>
+							</object>
+						</child>
+					</object>
+				</child>
+				<child>
+					<object class="AdwOverlaySplitView" id="split_view">
+						<property name="vexpand">True</property>
+						<property name="sidebar-width-fraction">0.15</property>
+						<property name="max-sidebar-width">240</property>
+						<property name="sidebar">
+							<object class="GtkBox" id="sidebar_container">
+								<property name="orientation">vertical</property>
+								<style>
+									<class name="background" />
+									<class name="sidebar-border" />
+								</style>
+							</object>
+						</property>
+						<property name="content">
+							<object class="GtkPaned" id="queue_split_view">
+								<property name="orientation">horizontal</property>
+								<property name="position">650</property>
+								<property name="wide-handle">True</property>
+								<property name="start-child">
+									<object class="GtkStack" id="main_stack">
+										<property name="hexpand">True</property>
+										<property name="vexpand">True</property>
+										<property name="transition-type">crossfade</property>
+										<child>
+											<object class="GtkStackPage">
+												<property name="name">now_playing</property>
+												<property name="child">
+													<object class="GtkBox">
+														<property name="orientation">vertical</property>
+														<property name="valign">center</property>
+														<property name="halign">center</property>
+														<child>
+															<object class="GtkImage">
+																<property name="icon-name">audio-x-generic-symbolic</property>
+																<property name="pixel-size">300</property>
+																<style>
+																	<class name="card" />
+																</style>
+															</object>
+														</child>
+													</object>
+												</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkStackPage">
+												<property name="name">home</property>
+												<property name="child">
+													<object class="GtkBox" id="home_container">
+														<property name="orientation">vertical</property>
+														<property name="hexpand">True</property>
+														<property name="vexpand">True</property>
+													</object>
+												</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkStackPage">
+												<property name="name">artist</property>
+												<property name="child">
+													<object class="GtkBox" id="artist_container">
+														<property name="orientation">vertical</property>
+														<property name="hexpand">True</property>
+														<property name="vexpand">True</property>
+													</object>
+												</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkStackPage">
+												<property name="name">explore</property>
+												<property name="child">
+													<object class="GtkBox" id="explore_container">
+														<property name="orientation">vertical</property>
+													</object>
+												</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkStackPage">
+												<property name="name">library</property>
+												<property name="child">
+													<object class="GtkBox" id="library_container">
+														<property name="orientation">vertical</property>
+													</object>
+												</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkStackPage">
+												<property name="name">album</property>
+												<property name="child">
+													<object class="GtkBox" id="album_container">
+														<property name="orientation">vertical</property>
+														<property name="hexpand">True</property>
+														<property name="vexpand">True</property>
+													</object>
+												</property>
+											</object>
+										</child>
+									</object>
+								</property>
+								<property name="end-child">
+									<object class="GtkBox" id="queue_container">
+										<property name="orientation">vertical</property>
+										<property name="width-request">350</property>
+										<property name="visible">False</property>
+									</object>
+								</property>
+							</object>
+						</property>
+					</object>
+				</child>
+				<child>
+					<object class="GtkBox" id="player_container">
+						<property name="orientation">horizontal</property>
+						<property name="vexpand">False</property>
+					</object>
+				</child>
+			</object>
+		</property>
+	</template>
+</interface>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0" />
+	<requires lib="libadwaita" version="1.0" />
+	<template class="AlbumView" parent="GtkOverlay">
+		<property name="hexpand">True</property>
+		<property name="vexpand">True</property>
+		<property name="child">
+			<object class="GtkScrolledWindow" id="content_box">
+				<property name="hexpand">True</property>
+				<property name="vexpand">True</property>
+				<property name="hscrollbar-policy">never</property>
+				<property name="vscrollbar-policy">automatic</property>
+				<child>
+					<object class="AdwClamp">
+						<property name="maximum-size">1000</property>
+						<property name="tightening-threshold">600</property>
+						<child>
+							<object class="GtkBox" id="album_box">
+								<property name="orientation">vertical</property>
+								<property name="spacing">32</property>
+								<property name="margin-start">24</property>
+								<property name="margin-end">24</property>
+								<property name="margin-top">32</property>
+								<property name="margin-bottom">100</property>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">horizontal</property>
+										<property name="spacing">24</property>
+										<child>
+											<object class="GtkImage" id="img_cover">
+												<property name="pixel-size">200</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkBox">
+												<property name="orientation">vertical</property>
+												<property name="valign">center</property>
+												<property name="spacing">8</property>
+												<child>
+													<object class="GtkLabel" id="lbl_album_title">
+														<property name="label">Loading Album...</property>
+														<property name="halign">start</property>
+														<property name="wrap">True</property>
+														<style>
+															<class name="title-1" />
+														</style>
+													</object>
+												</child>
+												<child>
+													<object class="GtkLabel" id="lbl_album_metadata">
+														<property name="label" />
+														<property name="halign">start</property>
+														<property name="wrap">True</property>
+														<style>
+															<class name="dim-label" />
+														</style>
+													</object>
+												</child>
+												<child>
+													<object class="GtkBox">
+														<property name="orientation">horizontal</property>
+														<property name="spacing">12</property>
+														<property name="margin-top">12</property>
+														<child>
+															<object class="GtkButton" id="btn_play_album">
+																<property name="label" translatable="yes">Play All</property>
+																<property name="icon-name">media-playback-start-symbolic</property>
+																<style>
+																	<class name="suggested-action" />
+																	<class name="pill" />
+																</style>
+															</object>
+														</child>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">4</property>
+										<child>
+											<object class="GtkLabel" id="lbl_description">
+												<property name="label" />
+												<property name="use-markup">True</property>
+												<property name="wrap">True</property>
+												<property name="halign">start</property>
+												<style>
+													<class name="dim-label" />
+												</style>
+											</object>
+										</child>
+										<child>
+											<object class="GtkToggleButton" id="btn_toggle_desc">
+												<property name="label" translatable="yes">Show more</property>
+												<property name="halign">start</property>
+												<property name="visible">False</property>
+												<property name="margin-top">16</property>
+												<style>
+													<class name="flat" />
+												</style>
+												<style>
+													<class name="dim-label" />
+												</style>
+											</object>
+										</child>
+									</object>
+								</child>
+								<child>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">12</property>
+										<child>
+											<object class="GtkListBox" id="list_tracks">
+												<property name="selection-mode">none</property>
+												<style>
+													<class name="boxed-list" />
+												</style>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</property>
+		<child type="overlay">
+			<object class="GtkSpinner" id="spinner">
+				<property name="halign">center</property>
+				<property name="valign">center</property>
+				<property name="width-request">48</property>
+				<property name="height-request">48</property>
+			</object>
+		</child>
+	</template>
+</interface>

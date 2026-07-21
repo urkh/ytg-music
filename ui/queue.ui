@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<requires lib="gtk" version="4.0"/>
+	<requires lib="libadwaita" version="1.0"/>
+	<template class="QueueView" parent="GtkBox">
+		<property name="orientation">vertical</property>
+		<property name="hexpand">True</property>
+		<property name="vexpand">True</property>
+		<child>
+			<object class="AdwViewStack" id="stack">
+				<property name="hexpand">True</property>
+				<property name="vexpand">True</property>
+				<child>
+					<object class="AdwViewStackPage">
+						<property name="name">queue</property>
+						<property name="child">
+							<object class="GtkBox" id="queue_container">
+								<property name="orientation">vertical</property>
+								<child>
+									<object class="GtkScrolledWindow">
+										<property name="hexpand">True</property>
+										<property name="vexpand">True</property>
+										<property name="hscrollbar-policy">never</property>
+										<property name="vscrollbar-policy">automatic</property>
+										<child>
+											<object class="GtkListBox" id="listbox">
+												<property name="selection-mode">none</property>
+												<style>
+													<class name="navigation-sidebar"/>
+												</style>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</property>
+					</object>
+				</child>
+				<child>
+					<object class="AdwViewStackPage">
+						<property name="name">lyrics</property>
+						<property name="child">
+							<object class="GtkBox" id="lyrics_container">
+								<property name="orientation">vertical</property>
+								<child>
+									<object class="GtkScrolledWindow" id="lyrics_scroll">
+										<property name="hexpand">True</property>
+										<property name="vexpand">True</property>
+										<property name="hscrollbar-policy">never</property>
+										<property name="vscrollbar-policy">automatic</property>
+										<child>
+											<object class="GtkBox" id="lyrics_box">
+												<property name="orientation">vertical</property>
+												<child>
+													<object class="GtkSpinner" id="lyrics_spinner">
+														<property name="halign">center</property>
+														<property name="valign">center</property>
+														<property name="margin-top">48</property>
+													</object>
+												</child>
+												<child>
+													<object class="GtkLabel" id="lyrics_label">
+														<property name="wrap">True</property>
+														<property name="justify">center</property>
+														<property name="margin-top">24</property>
+														<property name="margin-bottom">24</property>
+														<property name="margin-start">16</property>
+														<property name="margin-end">16</property>
+													</object>
+												</child>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</property>
+					</object>
+				</child>
+				<child>
+					<object class="AdwViewStackPage">
+						<property name="name">similar</property>
+						<property name="child">
+							<object class="GtkBox" id="similar_container">
+								<property name="orientation">vertical</property>
+								<child>
+									<object class="GtkScrolledWindow">
+										<property name="hexpand">True</property>
+										<property name="vexpand">True</property>
+										<property name="hscrollbar-policy">never</property>
+										<property name="vscrollbar-policy">automatic</property>
+										<child>
+											<object class="GtkListBox" id="similar_listbox">
+												<property name="selection-mode">none</property>
+												<style>
+													<class name="navigation-sidebar"/>
+												</style>
+											</object>
+										</child>
+									</object>
+								</child>
+							</object>
+						</property>
+					</object>
+				</child>
+			</object>
+		</child>
+	</template>
+</interface>
