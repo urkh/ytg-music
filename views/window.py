@@ -108,6 +108,8 @@ class MainWindow(Adw.ApplicationWindow):
                 self.main_search_entry.set_text('')
                 page_name = 'home'
             self.navigate_to(page_name)
+            if self.split_view.get_collapsed():
+                self.split_view.set_show_sidebar(False)
 
     @Gtk.Template.Callback()
     def on_search_activate(self, entry):
