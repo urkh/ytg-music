@@ -81,7 +81,7 @@ def test_mpris_service_properties_and_methods(mocker):
 
     # Test Root property handlers
     identity = mpris._handle_root_get_prop(None, '', '', '', 'Identity')
-    assert identity.unpack() == 'YouTube Music'
+    assert identity.unpack() == 'YTG Music'
 
     can_quit = mpris._handle_root_get_prop(None, '', '', '', 'CanQuit')
     assert can_quit.unpack() is True
