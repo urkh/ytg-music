@@ -2,6 +2,7 @@ import hashlib
 import math
 import os
 import threading
+from typing import Any, Optional
 
 import cairo
 import gi
@@ -10,7 +11,6 @@ import requests
 gi.require_version('Gtk', '4.0')
 gi.require_version('Gdk', '4.0')
 gi.require_version('GdkPixbuf', '2.0')
-from typing import Any, Optional
 from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 
 from utils.logger import get_logger  # noqa: E402

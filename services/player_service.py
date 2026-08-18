@@ -1,13 +1,16 @@
 import random
 from typing import Any, Dict, List, Optional
 
-from gi.repository import GLib, GObject, Gst
-from pytubefix import YouTube
+import gi
 
-from services.worker import run_in_background
-from utils.logger import get_logger
-from utils.memory import free_memory
-from utils.network import with_retries
+gi.require_version('Gst', '1.0')
+from gi.repository import GLib, GObject, Gst  # noqa: E402
+from pytubefix import YouTube  # noqa: E402
+
+from services.worker import run_in_background  # noqa: E402
+from utils.logger import get_logger  # noqa: E402
+from utils.memory import free_memory  # noqa: E402
+from utils.network import with_retries  # noqa: E402
 
 logger = get_logger(__name__)
 
@@ -31,6 +34,8 @@ class PlayerService(GObject.Object):
         ),  # pos, dur
         'queue-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
         'queue-index-changed': (GObject.SignalFlags.RUN_FIRST, None, (int,)),
+        'volume-changed': (GObject.SignalFlags.RUN_FIRST, None, (float,)),
+        'seeked': (GObject.SignalFlags.RUN_FIRST, None, (int,)),
     }
 
     def __init__(self):
@@ -48,6 +53,11 @@ class PlayerService(GObject.Object):
         self.is_playing = False
         self.is_loading = False
         self.current_video_id = None
+        self.current_position = 0
+        self.current_duration = 0
+        self.current_title = ''
+        self.current_artist = ''
+        self.current_thumb_url = ''
         self.timer_id = 0
 
     def start_timer(self) -> None:
@@ -65,9 +75,14 @@ class PlayerService(GObject.Object):
         pos_sec = position // Gst.SECOND if success_pos else 0
         dur_sec = duration // Gst.SECOND if success_dur else 0
 
+        if success_pos:
+            self.current_position = pos_sec
+        if success_dur and dur_sec > 0:
+            self.current_duration = dur_sec
+
         # Always emit if the position is valid
         if success_pos:
-            self.emit('position-changed', pos_sec, dur_sec)
+            self.emit('position-changed', pos_sec, self.current_duration)
 
         return True
 
@@ -127,7 +142,9 @@ class PlayerService(GObject.Object):
 
     def set_volume(self, value):
         # value expected between 0.0 and 1.0
-        self.player.set_property('volume', value)
+        val = max(0.0, min(1.0, float(value)))
+        self.player.set_property('volume', val)
+        self.emit('volume-changed', val)
 
     def toggle_shuffle(self):
         self.is_shuffle = not self.is_shuffle
@@ -141,6 +158,11 @@ class PlayerService(GObject.Object):
         if not video_id:
             return
         self.current_video_id = video_id
+        self.current_title = title
+        self.current_artist = artist
+        self.current_thumb_url = thumb_url or ''
+        self.current_position = 0
+        self.current_duration = 0
         self.emit('song-changed', title, artist, thumb_url or '')
 
         # Stop current playback
@@ -195,12 +217,16 @@ class PlayerService(GObject.Object):
         if not self.current_video_id:
             return
 
+        position_sec = max(0, float(position_sec))
         # Simple seek requires time in nanoseconds and correct flags
         self.player.seek_simple(
             Gst.Format.TIME,
             Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
             int(position_sec * Gst.SECOND),
         )
+        self.current_position = int(position_sec)
+        self.emit('seeked', int(position_sec))
+        self.emit('position-changed', int(position_sec), int(self.current_duration))
 
     def on_message(self, bus, message):
         t = message.type

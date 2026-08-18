@@ -40,7 +40,6 @@ def test_api_get_explore():
 
 
 def test_image_loader_disk_only_no_ram():
-
     import services.image_loader as image_loader
 
     # Verify that there is no LRU storage in RAM
@@ -52,3 +51,61 @@ def test_image_loader_disk_only_no_ram():
     path = image_loader.get_disk_cache_path(url)
     assert path.endswith('.img')
     assert 'thumbnails' in path
+
+
+def test_player_service_seek_and_volume():
+    from services.player_service import player_service
+
+    events = []
+    player_service.connect('volume-changed', lambda s, v: events.append(('volume', v)))
+    player_service.connect('seeked', lambda s, pos: events.append(('seeked', pos)))
+
+    player_service.set_volume(0.65)
+    assert player_service.player.get_property('volume') == pytest.approx(0.65)
+    assert ('volume', 0.65) in events
+
+    player_service.current_video_id = 'test_123'
+    player_service.seek(42)
+    assert player_service.current_position == 42
+    assert ('seeked', 42) in events
+
+
+def test_mpris_service_properties_and_methods(mocker):
+    from services.mpris import MPRISService
+    from services.player_service import player_service
+
+    mock_app = mocker.MagicMock()
+    mock_app.win = mocker.MagicMock()
+
+    mpris = MPRISService(mock_app)
+
+    # Test Root property handlers
+    identity = mpris._handle_root_get_prop(None, '', '', '', 'Identity')
+    assert identity.unpack() == 'YouTube Music'
+
+    can_quit = mpris._handle_root_get_prop(None, '', '', '', 'CanQuit')
+    assert can_quit.unpack() is True
+
+    # Test Player property handlers
+    player_service.is_playing = True
+    player_service.current_video_id = 'abc'
+    status = mpris._handle_player_get_prop(None, '', '', '', 'PlaybackStatus')
+    assert status.unpack() == 'Playing'
+
+    player_service.queue = [
+        {'videoId': 'abc', 'title': 'Test Song', 'artists': [{'name': 'Test Artist'}], 'thumbnails': []}
+    ]
+    player_service.current_index = 0
+    player_service.current_duration = 180
+
+    meta = mpris._handle_player_get_prop(None, '', '', '', 'Metadata')
+    meta_dict = meta.unpack()
+    assert meta_dict['xesam:title'] == 'Test Song'
+    assert meta_dict['xesam:artist'] == ['Test Artist']
+    assert meta_dict['mpris:length'] == 180 * 1_000_000
+
+    # Test Player method handlers
+    mock_invocation = mocker.MagicMock()
+    mpris._handle_player_method_call(None, '', '', '', 'PlayPause', None, mock_invocation)
+    mock_invocation.return_value.assert_called_once()
+

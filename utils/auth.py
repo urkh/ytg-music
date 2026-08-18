@@ -48,7 +48,10 @@ def extract_browser_cookies() -> str:
     filtered = [f'{c.name}={c.value}' for c in cj if 'youtube.com' in c.domain and c.name in essential_keys]
 
     if not filtered:
-        raise Exception('Error: The browser cookies are not present or are expired. Please, log in to YouTube Music and try again.')
+        raise Exception(
+            'Error: The browser cookies are not present or are expired. '
+            'Please, log in to YouTube Music and try again.'
+        )
 
     return '; '.join(filtered)
 

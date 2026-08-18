@@ -16,10 +16,15 @@
 }
 
 .ytm-timeline trough {
-    min-height: 2px;
-    background-color: alpha(currentColor, 0.1);
+    min-height: 3px;
+    background-color: alpha(currentColor, 0.15);
     border-radius: 0;
     margin: 0;
+    transition: min-height 0.15s ease-in-out;
+}
+
+.ytm-timeline:hover trough {
+    min-height: 5px;
 }
 
 .ytm-timeline highlight {
@@ -36,6 +41,16 @@
     background: transparent;
     border: none;
     box-shadow: none;
+    transition: opacity 0.15s ease-in-out, min-width 0.15s ease-in-out, min-height 0.15s ease-in-out;
+}
+
+.ytm-timeline:hover slider {
+    opacity: 1;
+    min-width: 12px;
+    min-height: 12px;
+    background-color: @accent_color;
+    border-radius: 50%;
+    margin: -3px 0;
 }
 
 .active-queue-row {

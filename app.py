@@ -8,6 +8,7 @@ gi.require_version('Gst', '1.0')
 
 from gi.repository import Adw, Gdk, Gio, GObject, Gtk  # noqa: E402
 
+from services.mpris import MPRISService  # noqa: E402
 from utils.i18n import setup_i18n  # noqa: E402
 from utils.logger import setup_logging  # noqa: E402
 from views.window import MainWindow  # noqa: E402
@@ -23,6 +24,11 @@ class YTGMusic(Adw.Application):
             application_id='com.github.urkh.ytgmusic',
             flags=Gio.ApplicationFlags.FLAGS_NONE,
         )
+        self.mpris_service = None
+
+    def do_startup(self):
+        Adw.Application.do_startup(self)
+        self.mpris_service = MPRISService(self)
 
     def do_activate(self):
         style_manager = Adw.StyleManager.get_default()

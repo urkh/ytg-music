@@ -46,6 +46,14 @@ class PlayerView(Gtk.Box):
             self.timeline_slider.set_adjustment(self.adj)
         self.timeline_slider.set_sensitive(False)
 
+        self._is_dragging = False
+        self.timeline_slider.connect('change-value', self.on_slider_change_value)
+
+        drag_gesture = Gtk.GestureDrag.new()
+        drag_gesture.connect('drag-begin', self.on_slider_drag_begin)
+        drag_gesture.connect('drag-end', self.on_slider_drag_end)
+        self.timeline_slider.add_controller(drag_gesture)
+
         vol_adj = Gtk.Adjustment(value=1.0, lower=0.0, upper=1.0, step_increment=0.05, page_increment=0.1)
         self.scale_volume.set_adjustment(vol_adj)
 
@@ -68,6 +76,8 @@ class PlayerView(Gtk.Box):
         player_service.connect('loading-changed', self.on_loading_changed)
         player_service.connect('song-changed', self.on_song_changed)
         player_service.connect('position-changed', self.on_position_changed)
+        player_service.connect('volume-changed', self.on_player_volume_changed)
+        player_service.connect('seeked', self.on_player_seeked)
         player_service.connect('queue-index-changed', self.update_nav_buttons)
         player_service.connect('queue-changed', self.update_nav_buttons)
         self.btn_prev.set_sensitive(False)
@@ -94,8 +104,11 @@ class PlayerView(Gtk.Box):
     @Gtk.Template.Callback()
     def on_volume_changed(self, scale):
         val = scale.get_value()
-        player_service.set_volume(val)
+        self._update_volume_icon(val)
+        if abs(player_service.player.get_property('volume') - val) > 0.005:
+            player_service.set_volume(val)
 
+    def _update_volume_icon(self, val):
         if val == 0:
             self.btn_volume.set_icon_name('audio-volume-muted-symbolic')
         elif val < 0.33:
@@ -104,6 +117,28 @@ class PlayerView(Gtk.Box):
             self.btn_volume.set_icon_name('audio-volume-medium-symbolic')
         else:
             self.btn_volume.set_icon_name('audio-volume-high-symbolic')
+
+    def on_player_volume_changed(self, service, volume):
+        if abs(self.scale_volume.get_value() - volume) > 0.005:
+            self.scale_volume.set_value(volume)
+        self._update_volume_icon(volume)
+
+    def on_slider_drag_begin(self, gesture, start_x, start_y):
+        self._is_dragging = True
+
+    def on_slider_drag_end(self, gesture, offset_x, offset_y):
+        self._is_dragging = False
+        val = self.adj.get_value()
+        player_service.seek(val)
+
+    def on_slider_change_value(self, slider, scroll_type, value):
+        if not self._is_dragging:
+            player_service.seek(value)
+        return False
+
+    def on_player_seeked(self, service, position_sec):
+        if not self._is_dragging:
+            self.adj.set_value(position_sec)
 
     @Gtk.Template.Callback()
     def on_like_clicked(self, button):
@@ -213,6 +248,8 @@ class PlayerView(Gtk.Box):
 
     def on_song_changed(self, service, title, artist, thumb_url):
         self.btn_play.set_sensitive(True)
+        self.timeline_slider.set_sensitive(True)
+        self.adj.set_value(0)
         self.lbl_title.set_label(title)
         self.img_cover.set_opacity(1.0)
 
@@ -296,10 +333,11 @@ class PlayerView(Gtk.Box):
             s = seconds % 60
             return f'{m}:{s:02d}'
 
-        self.time_label.set_label(f'{format_time(position)} / {format_time(duration)}')
+        if not self._is_dragging:
+            self.time_label.set_label(f'{format_time(position)} / {format_time(duration)}')
 
-        if duration > 0:
-            if self.adj.get_upper() != duration:
-                self.adj.set_upper(duration)
+            if duration > 0:
+                if self.adj.get_upper() != duration:
+                    self.adj.set_upper(duration)
 
-            self.adj.set_value(position)
+                self.adj.set_value(position)
