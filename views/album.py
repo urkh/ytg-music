@@ -6,7 +6,6 @@ from services.player_service import player_service
 from services.worker import run_in_background
 from services.ytmusic import api
 from utils.formatters import format_description
-from utils.memory import free_memory
 from utils.ui_components import hide_error_page, show_error_page, update_active_list_row
 
 
@@ -90,8 +89,6 @@ class AlbumView(Gtk.Overlay):
         self._set_cover_image(detail.best_thumbnail_url)
 
         self._render_tracks(detail.tracks)
-
-        free_memory()
 
     def on_track_activated(self, listbox, row):
         if not self.album_detail or not hasattr(row, '_item'):

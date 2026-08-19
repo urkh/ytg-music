@@ -6,7 +6,6 @@ from services.player_service import player_service
 from services.worker import run_in_background
 from services.ytmusic import api
 from utils.formatters import format_description
-from utils.memory import free_memory
 from utils.ui_components import (
     create_item_card,
     create_song_row,
@@ -107,8 +106,6 @@ class ArtistView(Gtk.Overlay):
 
         self._render_songs(detail.songs)
         self._render_albums(detail.albums)
-
-        free_memory()
 
     def on_song_activated(self, listbox, row):
         if not hasattr(row, '_item'):

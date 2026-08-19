@@ -2,7 +2,6 @@ from gi.repository import Adw, GLib, Gtk
 
 from services.worker import run_in_background
 from services.ytmusic import api
-from utils.memory import free_memory
 from views.album import AlbumView
 from views.artist import ArtistView
 from views.explore import ExploreView
@@ -266,14 +265,12 @@ class MainWindow(Adw.ApplicationWindow):
             self.explore_view.load_data()
 
         self.main_stack.set_visible_child_name(view_name)
-        GLib.idle_add(free_memory)
 
     @Gtk.Template.Callback()
     def on_back_clicked(self, btn):
         if self.navigation_history:
             prev_view = self.navigation_history.pop()
             self.main_stack.set_visible_child_name(prev_view)
-            GLib.idle_add(free_memory)
             if not self.navigation_history:
                 self.btn_back.set_visible(False)
 

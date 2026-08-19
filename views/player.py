@@ -5,7 +5,6 @@ from services.player_service import player_service
 from services.worker import run_in_background
 from services.ytmusic import api
 from utils.logger import get_logger
-from utils.memory import free_memory
 
 logger = get_logger(__name__)
 
@@ -295,7 +294,6 @@ class PlayerView(Gtk.Box):
                         if idx >= 0 and idx < len(player_service.queue):
                             if player_service.queue[idx].get('videoId') == vid:
                                 player_service.queue[idx]['likeStatus'] = status
-                    GLib.idle_add(free_memory)
 
                 run_in_background(fetch_status, on_status_loaded)
 

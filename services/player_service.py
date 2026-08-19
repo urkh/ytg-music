@@ -9,7 +9,6 @@ from pytubefix import YouTube  # noqa: E402
 
 from services.worker import run_in_background  # noqa: E402
 from utils.logger import get_logger  # noqa: E402
-from utils.memory import free_memory  # noqa: E402
 from utils.network import with_retries  # noqa: E402
 
 logger = get_logger(__name__)
@@ -191,7 +190,6 @@ class PlayerService(GObject.Object):
             self.is_playing = True
             self.emit('state-changed', True)
             self.start_timer()
-            GLib.idle_add(free_memory)
 
         def on_url_error(e: Exception) -> None:
             self.is_loading = False
@@ -234,7 +232,6 @@ class PlayerService(GObject.Object):
             self.player.set_state(Gst.State.READY)
             self.is_playing = False
             self.emit('state-changed', False)
-            GLib.idle_add(free_memory)
             self.next_song()
         elif t == Gst.MessageType.ERROR:
             err, debug = message.parse_error()
@@ -243,7 +240,6 @@ class PlayerService(GObject.Object):
             self.is_playing = False
             self.emit('state-changed', False)
             self.emit('error', str(err))
-            GLib.idle_add(free_memory)
 
 
 player_service = PlayerService()
