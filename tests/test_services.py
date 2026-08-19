@@ -1,6 +1,10 @@
+from concurrent.futures import ThreadPoolExecutor
+
 import pytest
 
-from services import ytmusic
+from services import image_loader, worker, ytmusic
+from services.mpris import MPRISService
+from services.player_service import player_service
 
 
 @pytest.mark.vcr()
@@ -40,8 +44,6 @@ def test_api_get_explore():
 
 
 def test_image_loader_disk_only_no_ram():
-    import services.image_loader as image_loader
-
     # Verify that there is no LRU storage in RAM
     assert not hasattr(image_loader, '_image_cache')
     assert not hasattr(image_loader, 'MAX_CACHE_SIZE')
@@ -53,24 +55,17 @@ def test_image_loader_disk_only_no_ram():
     assert 'thumbnails' in path
 
     # Verify bounded thread pool for image loader
-    from concurrent.futures import ThreadPoolExecutor
     assert isinstance(image_loader._image_executor, ThreadPoolExecutor)
     assert image_loader._image_executor._max_workers == 4
 
 
 def test_worker_bounded_thread_pool():
-    from concurrent.futures import ThreadPoolExecutor
-
-    import services.worker as worker
-
     # Verify bounded thread pool for general worker tasks
     assert isinstance(worker._executor, ThreadPoolExecutor)
     assert worker._executor._max_workers == 4
 
 
 def test_player_service_seek_and_volume():
-    from services.player_service import player_service
-
     events = []
     player_service.connect('volume-changed', lambda s, v: events.append(('volume', v)))
     player_service.connect('seeked', lambda s, pos: events.append(('seeked', pos)))
@@ -86,9 +81,6 @@ def test_player_service_seek_and_volume():
 
 
 def test_mpris_service_properties_and_methods(mocker):
-    from services.mpris import MPRISService
-    from services.player_service import player_service
-
     mock_app = mocker.MagicMock()
     mock_app.win = mocker.MagicMock()
 
@@ -123,4 +115,3 @@ def test_mpris_service_properties_and_methods(mocker):
     mock_invocation = mocker.MagicMock()
     mpris._handle_player_method_call(None, '', '', '', 'PlayPause', None, mock_invocation)
     mock_invocation.return_value.assert_called_once()
-

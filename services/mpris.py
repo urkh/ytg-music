@@ -1,10 +1,13 @@
 import re
 from typing import Any, Dict, Optional
 
-from gi.repository import Gio, GLib, Gst
+import gi
 
-from services.player_service import player_service
-from utils.logger import get_logger
+gi.require_version('Gst', '1.0')
+from gi.repository import Gio, GLib, Gst  # noqa: E402
+
+from services.player_service import player_service  # noqa: E402
+from utils.logger import get_logger  # noqa: E402
 
 logger = get_logger(__name__)
 

@@ -21,7 +21,7 @@ class APIProxy:
         headers_path = get_auth_file_path()
         if os.path.exists(headers_path):
             try:
-                # Silent cookie refresh (Google expires TS cookies very quickly now)
+                # Refresh browser cookies silently
                 try:
                     fresh_cookie_str = extract_browser_cookies()
                     fresh_base = build_base_headers(fresh_cookie_str)
@@ -35,7 +35,7 @@ class APIProxy:
                     with open(headers_path, 'w') as f:
                         json.dump(headers_data, f, indent=2)
                 except Exception as e:
-                    logger.debug(f'Refresco silencioso de cookies falló: {e}')
+                    logger.debug(f'Cookie refresh failed: {e}')
 
                 cls._instance = YTMusic(headers_path)
                 logger.info('YTMusic initialized with Cookies')
