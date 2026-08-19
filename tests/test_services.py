@@ -52,6 +52,21 @@ def test_image_loader_disk_only_no_ram():
     assert path.endswith('.img')
     assert 'thumbnails' in path
 
+    # Verify bounded thread pool for image loader
+    from concurrent.futures import ThreadPoolExecutor
+    assert isinstance(image_loader._image_executor, ThreadPoolExecutor)
+    assert image_loader._image_executor._max_workers == 4
+
+
+def test_worker_bounded_thread_pool():
+    from concurrent.futures import ThreadPoolExecutor
+
+    import services.worker as worker
+
+    # Verify bounded thread pool for general worker tasks
+    assert isinstance(worker._executor, ThreadPoolExecutor)
+    assert worker._executor._max_workers == 4
+
 
 def test_player_service_seek_and_volume():
     from services.player_service import player_service

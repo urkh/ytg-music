@@ -1,4 +1,4 @@
-import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, Optional
 
 from gi.repository import GLib
@@ -7,6 +7,9 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Bounded thread pool for general background tasks
+_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix='worker')
+
 
 def run_in_background(
     task_func: Callable[[], Any],
@@ -14,8 +17,8 @@ def run_in_background(
     on_error: Optional[Callable[[Exception], Any]] = None,
 ) -> None:
     """
-    Ejecuta 'task_func' en un hilo en segundo plano (Thread).
-    Cuando termina, usa 'GLib.idle_add' para ejecutar 'on_complete' o 'on_error' en el hilo principal de la UI.
+    Executes 'task_func' in a background thread using a bounded ThreadPoolExecutor.
+    When it finishes, uses 'GLib.idle_add' to execute 'on_complete' or 'on_error' in the main UI thread.
     """
 
     def worker():
@@ -27,9 +30,8 @@ def run_in_background(
             if on_error:
                 GLib.idle_add(on_error, e)
             else:
-                logger.error(f'Error en tarea de segundo plano: {e}')
+                logger.error(f'Error in background task: {e}')
                 if on_complete:
                     GLib.idle_add(on_complete, None)
 
-    thread = threading.Thread(target=worker, daemon=True)
-    thread.start()
+    _executor.submit(worker)

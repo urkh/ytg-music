@@ -1,7 +1,7 @@
 import hashlib
 import math
 import os
-import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Optional
 
 import cairo
@@ -16,6 +16,9 @@ from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 from utils.logger import get_logger  # noqa: E402
 
 logger = get_logger(__name__)
+
+# Bounded thread pool for downloading and processing thumbnail images
+_image_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix='image-loader')
 
 
 def get_cache_dir() -> str:
@@ -59,7 +62,7 @@ def load_image_async(
     is_unrounded: bool = False,
     max_size: int = 200,
 ) -> None:
-    """Downloads an image asynchronously (disk-only cache, web style) and processes it with downscaling."""
+    """Downloads an image and processes it with downscaling"""
     if not url:
         return
 
@@ -82,7 +85,7 @@ def load_image_async(
                         with open(disk_path, 'wb') as f:
                             f.write(content)
                     except Exception as e:
-                        logger.warning(f'Error escribiendo caché en disco {disk_path}: {e}')
+                        logger.warning(f'Error writing disk cache {disk_path}: {e}')
 
             if content:
                 bytes_data = GLib.Bytes.new(content)
@@ -90,7 +93,6 @@ def load_image_async(
                 pixbuf = GdkPixbuf.Pixbuf.new_from_stream(stream, None)
                 stream.close()
 
-                # Efficient downscaling in RAM
                 if pixbuf.get_width() > max_size or pixbuf.get_height() > max_size:
                     pixbuf = pixbuf.scale_simple(max_size, max_size, GdkPixbuf.InterpType.BILINEAR)
 
@@ -99,7 +101,7 @@ def load_image_async(
                         radius = min(pixbuf.get_width(), pixbuf.get_height()) / 2
                         pixbuf = round_pixbuf(pixbuf, radius=radius)
                     else:
-                        pixbuf = round_pixbuf(pixbuf, radius=16)  # 16px radius
+                        pixbuf = round_pixbuf(pixbuf, radius=16)
 
                 def update_ui():
                     texture = Gdk.Texture.new_for_pixbuf(pixbuf)
@@ -110,6 +112,6 @@ def load_image_async(
 
                 GLib.idle_add(update_ui)
         except Exception as e:
-            logger.warning(f'Error descargando imagen {url}: {e}')
+            logger.warning(f'Error downloading image {url}: {e}')
 
-    threading.Thread(target=worker, daemon=True).start()
+    _image_executor.submit(worker)
