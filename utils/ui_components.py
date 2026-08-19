@@ -60,32 +60,8 @@ def create_item_card(app, item: MediaItem) -> Gtk.Box:
 
     box.append(vbox)
 
-    box._lbl_title = title_lbl
-    box._lbl_subtitle = subtitle_lbl
-    box._img_cover = img
     box._item = item
     return box
-
-
-def update_item_card(box: Gtk.Box, item: MediaItem) -> None:
-    """Updates the visual data of an existing generic card to avoid creating and destroying widgets"""
-    box._lbl_title.set_label(item.display_title)
-    box._lbl_subtitle.set_label(item.display_subtitle)
-
-    if item.resultType == 'artist':
-        box._img_cover.add_css_class('circular')
-    else:
-        box._img_cover.remove_css_class('circular')
-
-    box._img_cover.clear()
-
-    thumb_url = item.best_thumbnail_url
-    if thumb_url:
-        load_image_async(thumb_url, box._img_cover, max_size=200)
-    else:
-        box._img_cover.set_from_icon_name('audio-x-generic-symbolic')
-
-    box._item = item
 
 
 def on_card_clicked(app, item: MediaItem):
