@@ -49,8 +49,7 @@ def extract_browser_cookies() -> str:
 
     if not filtered:
         raise Exception(
-            'Error: The browser cookies are not present or are expired. '
-            'Please, log in to YouTube Music and try again.'
+            'Error: The browser cookies are not present or are expired. Please, log in to YouTube Music and try again.'
         )
 
     return '; '.join(filtered)

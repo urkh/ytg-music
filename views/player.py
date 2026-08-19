@@ -82,8 +82,6 @@ class PlayerView(Gtk.Box):
         self.btn_prev.set_sensitive(False)
         self.btn_next.set_sensitive(False)
 
-
-
     @Gtk.Template.Callback()
     def on_prev_clicked(self, button):
         player_service.prev_song()

@@ -161,7 +161,7 @@ def update_song_row(row: Adw.ActionRow, item: MediaItem) -> None:
 
 def update_active_list_row(list_widget, current_video_id: str):
     """
-    Iterates over the children of a container widget and updates 
+    Iterates over the children of a container widget and updates
     the CSS class `active-queue-row` on the row matching the current video
     """
     if not list_widget:

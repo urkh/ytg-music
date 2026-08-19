@@ -71,6 +71,7 @@ class MPRISService:
     """
     Implements the MPRIS 2 D-Bus specification for native integration with GNOME Shell
     """
+
     OBJECT_PATH = '/org/mpris/MediaPlayer2'
     BUS_NAME = 'org.mpris.MediaPlayer2.ytgmusic'
 
@@ -373,10 +374,12 @@ class MPRISService:
             GLib.idle_add(player_service.toggle_play)
             invocation.return_value(None)
         elif method_name == 'Stop':
+
             def do_stop():
                 player_service.player.set_state(Gst.State.NULL)
                 player_service.is_playing = False
                 player_service.emit('state-changed', False)
+
             GLib.idle_add(do_stop)
             invocation.return_value(None)
         elif method_name == 'Play':

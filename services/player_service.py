@@ -168,7 +168,7 @@ class PlayerService(GObject.Object):
         self.player.set_state(Gst.State.NULL)
         self.is_playing = False
         self.emit('state-changed', False)
-        
+
         self.is_loading = True
         self.emit('loading-changed', True)
 
