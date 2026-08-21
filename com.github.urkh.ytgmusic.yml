@@ -1,0 +1,45 @@
+app-id: com.github.urkh.ytgmusic
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+command: ytgmusic
+
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --share=network
+  - --socket=pulseaudio
+  - --own-name=org.mpris.MediaPlayer2.ytgmusic
+
+modules:
+  - name: ytgmusic
+    buildsystem: simple
+    build-options:
+      build-args:
+        - --share=network
+    build-commands:
+      - pip3 install --prefix=/app browsercookie pydantic pytubefix ytmusicapi
+      - install -d /app/share/ytgmusic /app/bin /app/share/applications
+      - cp -r app.py assets locales models services ui utils views /app/share/ytgmusic/
+      - |
+        cat << 'EOF' > /app/bin/ytgmusic
+        #!/bin/sh
+        cd /app/share/ytgmusic
+        exec python3 /app/share/ytgmusic/app.py "$@"
+        EOF
+      - chmod +x /app/bin/ytgmusic
+      - |
+        cat << 'EOF' > /app/share/applications/com.github.urkh.ytgmusic.desktop
+        [Desktop Entry]
+        Name=YTG Music
+        Comment=YouTube Music Desktop Client
+        Exec=ytgmusic
+        Icon=audio-x-generic
+        Terminal=false
+        Type=Application
+        Categories=AudioVideo;Audio;Player;GTK;
+        EOF
+    sources:
+      - type: dir
+        path: .

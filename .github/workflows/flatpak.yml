@@ -8,53 +8,31 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  flatpak:
+    name: "Flatpak Build"
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-47
+      options: --privileged
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python (for any scripts)
-        uses: actions/setup-python@v5
+      - name: Build Flatpak Bundle
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          python-version: '3.11'
-
-      - name: Install Flatpak and SDK
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y flatpak flatpak-builder
-          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install --user -y flathub org.gnome.Platform//44 org.gnome.Sdk//44
-
-      - name: Build Flatpak
-        run: |
-          flatpak-builder --repo=repo build-dir org.ytg_music.yml
-
-      - name: Run tests inside Flatpak (optional)
-        run: |
-          flatpak run --command=sh org.ytg_music -c "pytest"
-        continue-on-error: true
-
-      - name: Export Flatpak bundle
-        run: |
-          flatpak build-bundle repo org.ytg_music.flatpak org.ytg_music
+          bundle: com.github.urkh.ytgmusic.flatpak
+          manifest-path: com.github.urkh.ytgmusic.yml
+          cache-key: flatpak-builder-${{ github.sha }}
 
       - name: Upload bundle as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flatpak-bundle
-          path: org.ytg_music.flatpak
+          name: com.github.urkh.ytgmusic.flatpak
+          path: com.github.urkh.ytgmusic.flatpak
 
-      - name: Create GitHub Release (on tag)
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag=${GITHUB_REF#refs/tags/}
-          hub release create -m "Release $tag" -a org.ytg_music.flatpak "$tag"
-
-      - name: Upload bundle to release
+      - name: Release to GitHub (on tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: org.ytg_music.flatpak
+          files: com.github.urkh.ytgmusic.flatpak
