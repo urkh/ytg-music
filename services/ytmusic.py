@@ -3,6 +3,9 @@ import os
 from typing import Any, Optional
 
 from ytmusicapi import YTMusic
+from ytmusicapi.mixins import library as _library_mixin
+from ytmusicapi.navigation import NAVIGATION_BROWSE_ID, THUMBNAIL_RENDERER, TITLE, TITLE_TEXT, nav
+from ytmusicapi.parsers import browsing as _browsing
 
 from utils.auth import (
     build_base_headers,
@@ -15,6 +18,27 @@ from utils.logger import get_logger
 from utils.network import with_retries
 
 logger = get_logger(__name__)
+
+# Patch ytmusicapi parse_playlist to handle playlists with missing/empty thumbnail renderers
+_orig_parse_playlist = _browsing.parse_playlist
+
+
+def _safe_parse_playlist(data):
+    try:
+        return _orig_parse_playlist(data)
+    except Exception:
+        playlist = {
+            'title': nav(data, TITLE_TEXT, none_if_absent=True) or 'Playlist',
+            'playlistId': nav(data, TITLE + NAVIGATION_BROWSE_ID, none_if_absent=True),
+            'thumbnails': nav(data, THUMBNAIL_RENDERER, none_if_absent=True) or [],
+        }
+        if playlist.get('playlistId') and playlist['playlistId'].startswith('VL'):
+            playlist['playlistId'] = playlist['playlistId'][2:]
+        return playlist
+
+
+_browsing.parse_playlist = _safe_parse_playlist
+_library_mixin.parse_playlist = _safe_parse_playlist
 
 
 class APIProxy:

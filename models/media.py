@@ -6,12 +6,12 @@ from pydantic import BaseModel, ConfigDict, Field
 class HomeSection(BaseModel):
     model_config = ConfigDict(extra='allow')
     title: Optional[str] = None
-    contents: List[Dict[str, Any]] = Field(default_factory=list)
+    contents: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
 
 class TrendingSection(BaseModel):
     model_config = ConfigDict(extra='allow')
-    items: List[Dict[str, Any]] = Field(default_factory=list)
+    items: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
 
 class MoodGenre(BaseModel):
@@ -22,15 +22,15 @@ class MoodGenre(BaseModel):
 
 class ExploreData(BaseModel):
     model_config = ConfigDict(extra='allow')
-    new_releases: List[Dict[str, Any]] = Field(default_factory=list)
+    new_releases: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
     trending: Optional[TrendingSection] = None
-    moods_and_genres: List[MoodGenre] = Field(default_factory=list)
+    moods_and_genres: Optional[List[MoodGenre]] = Field(default_factory=list)
 
 
 class LibrarySection(BaseModel):
     model_config = ConfigDict(extra='allow')
     title: str = ''
-    contents: List[Dict[str, Any]] = Field(default_factory=list)
+    contents: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
     force_type: str = ''
 
 
@@ -48,9 +48,9 @@ class MediaItem(BaseModel):
     browseId: Optional[str] = None
     playlistId: Optional[str] = None
 
-    thumbnails: List[Dict[str, Any]] = Field(default_factory=list)
-    artists: List[Dict[str, Any]] = Field(default_factory=list)
-    author: Any = Field(default_factory=list)
+    thumbnails: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
+    artists: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
+    author: Optional[Any] = Field(default_factory=list)
     description: Optional[str] = None
 
     duration: Optional[str] = None
@@ -59,7 +59,7 @@ class MediaItem(BaseModel):
 
     @property
     def best_thumbnail_url(self) -> Optional[str]:
-        if not self.thumbnails:
+        if not self.thumbnails or not isinstance(self.thumbnails, list):
             return None
         return self.thumbnails[-1].get('url')
 
@@ -73,7 +73,7 @@ class MediaItem(BaseModel):
 
         elif self.resultType == 'playlist':
             if self.author:
-                if isinstance(self.author, list) and isinstance(self.author[0], dict):
+                if isinstance(self.author, list) and len(self.author) > 0 and isinstance(self.author[0], dict):
                     return self.author[0].get('name', 'Playlist')
                 elif isinstance(self.author, str):
                     return self.author
@@ -83,10 +83,10 @@ class MediaItem(BaseModel):
 
         else:
             artist_name = ''
-            if self.artists and isinstance(self.artists, list):
+            if self.artists and isinstance(self.artists, list) and len(self.artists) > 0:
                 artist_name = self.artists[0].get('name', 'Artist')
             elif self.author:
-                if isinstance(self.author, list) and isinstance(self.author[0], dict):
+                if isinstance(self.author, list) and len(self.author) > 0 and isinstance(self.author[0], dict):
                     artist_name = self.author[0].get('name', 'Artist')
                 elif isinstance(self.author, str):
                     artist_name = self.author
@@ -108,7 +108,7 @@ class MediaItem(BaseModel):
         """
         Serializes this item to a dictionary format compatible with the player
         """
-        artists = self.artists
+        artists = self.artists or []
         if not artists and self.author:
             if isinstance(self.author, list):
                 artists = self.author
@@ -121,7 +121,7 @@ class MediaItem(BaseModel):
             'videoId': self.videoId,
             'title': self.title,
             'artists': artists,
-            'thumbnails': self.thumbnails,
+            'thumbnails': self.thumbnails or [],
             'album': self.album or {},
             'duration': self.duration or '',
         }
@@ -132,6 +132,13 @@ def parse_media_item(data: dict, force_type: Optional[str] = None) -> MediaItem:
     Convert a raw dictionary into a MediaItem
     """
     parsed_data = dict(data)
+
+    if parsed_data.get('thumbnails') is None:
+        parsed_data['thumbnails'] = []
+    if parsed_data.get('artists') is None:
+        parsed_data['artists'] = []
+    if parsed_data.get('author') is None:
+        parsed_data['author'] = []
 
     if force_type:
         parsed_data['resultType'] = force_type
@@ -168,9 +175,9 @@ class ArtistDetail(BaseModel):
     subscribers: Optional[str] = None
     description: Optional[str] = None
     subscribed: bool = False
-    thumbnails: List[Dict[str, Any]] = Field(default_factory=list)
-    songs: Dict[str, Any] = Field(default_factory=dict)
-    albums: Dict[str, Any] = Field(default_factory=dict)
+    thumbnails: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
+    songs: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    albums: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
     @property
     def display_subscribers(self) -> str:
@@ -181,7 +188,7 @@ class ArtistDetail(BaseModel):
 
     @property
     def best_thumbnail_url(self) -> Optional[str]:
-        if not self.thumbnails:
+        if not self.thumbnails or not isinstance(self.thumbnails, list):
             return None
         return self.thumbnails[-1].get('url')
 
@@ -190,34 +197,35 @@ class AlbumDetail(BaseModel):
     model_config = ConfigDict(extra='allow')
 
     title: str = Field(default='Unknown')
-    artists: List[Dict[str, Any]] = Field(default_factory=list)
+    artists: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
     year: Optional[str] = None
     trackCount: int = 0
     description: Optional[str] = None
-    thumbnails: List[Dict[str, Any]] = Field(default_factory=list)
-    tracks: List[Dict[str, Any]] = Field(default_factory=list)
+    thumbnails: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
+    tracks: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
     @property
     def artist_name(self) -> str:
-        if self.artists and isinstance(self.artists, list):
+        if self.artists and isinstance(self.artists, list) and len(self.artists) > 0:
             return self.artists[0].get('name', 'Artist')
         return 'Artist'
 
     @property
     def artist_id(self) -> Optional[str]:
-        if self.artists and isinstance(self.artists, list):
+        if self.artists and isinstance(self.artists, list) and len(self.artists) > 0:
             return self.artists[0].get('id')
         return None
 
     @property
     def best_thumbnail_url(self) -> Optional[str]:
-        if not self.thumbnails:
+        if not self.thumbnails or not isinstance(self.thumbnails, list):
             return None
         return self.thumbnails[-1].get('url')
 
     def get_queue_tracks(self, album_id: str) -> List[Dict[str, Any]]:
         queue = []
-        for track in self.tracks:
+        tracks = self.tracks or []
+        for track in tracks:
             video_id = track.get('videoId')
             if not video_id:
                 continue
@@ -226,8 +234,8 @@ class AlbumDetail(BaseModel):
                 {
                     'videoId': video_id,
                     'title': track.get('title', 'Unknown'),
-                    'artists': track.get('artists') or self.artists,
-                    'thumbnails': self.thumbnails,
+                    'artists': track.get('artists') or self.artists or [],
+                    'thumbnails': self.thumbnails or [],
                     'album': {'name': self.title, 'id': album_id},
                     'year': self.year,
                 }

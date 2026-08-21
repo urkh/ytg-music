@@ -69,11 +69,7 @@ def extract_browser_cookies() -> str:
     for name, loader in browser_loaders:
         try:
             cj = loader()
-            filtered = [
-                f'{c.name}={c.value}'
-                for c in cj
-                if 'youtube.com' in c.domain and c.name in essential_keys
-            ]
+            filtered = [f'{c.name}={c.value}' for c in cj if 'youtube.com' in c.domain and c.name in essential_keys]
             if filtered:
                 logger.info(f'Successfully extracted YouTube cookies from {name}')
                 return '; '.join(filtered)
