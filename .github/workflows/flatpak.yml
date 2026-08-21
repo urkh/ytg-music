@@ -1,4 +1,4 @@
-name: Flatpak CI
+name: CI
 
 on:
   push:
@@ -11,8 +11,33 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    name: "Tests & Linting"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-4-dev libadwaita-1-dev libgstreamer1.0-dev libgirepository1.0-dev libcairo2-dev
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+
+      - name: Run Ruff Lint Check
+        run: uv run ruff check .
+
+      - name: Run Unit Tests
+        run: uv run pytest
+
   flatpak:
     name: "Flatpak Build"
+    needs: test
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-47

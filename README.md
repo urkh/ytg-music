@@ -1,7 +1,7 @@
 # YouTube Music Desktop Client
 
 [![Release](https://img.shields.io/github/v/release/urkh/ytg-music?logo=github&style=flat-square)](https://github.com/urkh/ytg-music/releases)
-[![Flatpak CI](https://github.com/urkh/ytg-music/actions/workflows/flatpak.yml/badge.svg)](https://github.com/urkh/ytg-music/actions/workflows/flatpak.yml)
+[![Build](https://github.com/urkh/ytg-music/actions/workflows/flatpak.yml/badge.svg)](https://github.com/urkh/ytg-music/actions/workflows/flatpak.yml)
 [![GTK4 / Libadwaita](https://img.shields.io/badge/GTK4-Libadwaita-4a90d9?logo=gnome&logoColor=white&style=flat-square)](https://gnome.pages.gitlab.gnome.org/libadwaita/)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white&style=flat-square)](https://www.python.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
