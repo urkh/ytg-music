@@ -1,11 +1,9 @@
-import os
-
 from gi.repository import Gtk, Pango
 
 from services.image_loader import load_image_async
 from services.worker import run_in_background
 from services.ytmusic import api
-from utils.auth import get_auth_file_path
+from utils.auth import is_authenticated
 from utils.i18n import _
 from views.login import LoginDialog
 
@@ -32,8 +30,7 @@ class SidebarView(Gtk.Box):
             app_instance.connect('login-state-changed', lambda *args: self.check_login_state())
 
     def check_login_state(self):
-        headers_path = get_auth_file_path()
-        if os.path.exists(headers_path):
+        if is_authenticated():
             self.btn_login.set_sensitive(False)
             if self.row_library:
                 self.row_library.set_visible(True)
@@ -46,10 +43,10 @@ class SidebarView(Gtk.Box):
 
             def on_info_loaded(info):
                 if not info:
-                    self.btn_login.set_label(_('Conectado'))
+                    self.btn_login.set_label(_('Connected'))
                     return
 
-                name = info.get('accountName', _('Conectado'))
+                name = info.get('accountName', _('Connected'))
                 photo_url = info.get('accountPhotoUrl')
 
                 box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)

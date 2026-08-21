@@ -8,7 +8,7 @@
 		<property name="hide-on-close">True</property>
 		<property name="default-width">450</property>
 		<property name="default-height">350</property>
-		<property name="title">Vincular con YouTube Music</property>
+		<property name="title">Connect to YouTube Music</property>
 		<property name="content">
 			<object class="GtkBox">
 				<property name="orientation">vertical</property>
@@ -19,8 +19,15 @@
 					</object>
 				</child>
 				<child>
-					<object class="GtkBox" id="content_box">
-						<property name="orientation">vertical</property>
+					<object class="GtkStack" id="stack">
+						<property name="transition-type">slide-left-right</property>
+						<property name="vexpand">True</property>
+						<child>
+							<object class="GtkStackPage">
+								<property name="name">page_main</property>
+								<property name="child">
+									<object class="GtkBox" id="content_box">
+										<property name="orientation">vertical</property>
 						<property name="valign">center</property>
 						<property name="halign">center</property>
 						<property name="spacing">24</property>
@@ -58,8 +65,98 @@
 							</object>
 						</child>
 						<child>
+							<!-- Hidden until upstream ytmusicapi issue #813 is resolved -->
+							<object class="GtkButton" id="btn_oauth">
+								<signal name="clicked" handler="on_oauth_clicked"/>
+								<property name="label">Login with Browser (OAuth)</property>
+								<property name="visible">False</property>
+								<property name="margin-top">8</property>
+								<style>
+									<class name="pill"/>
+								</style>
+							</object>
+						</child>
+						<child>
 							<object class="GtkSpinner" id="spinner">
 								<property name="margin-top">16</property>
+							</object>
+						</child>
+					</object>
+								</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkStackPage">
+								<property name="name">page_oauth</property>
+								<property name="child">
+									<object class="GtkBox" id="oauth_box">
+										<property name="orientation">vertical</property>
+										<property name="valign">center</property>
+										<property name="halign">center</property>
+										<property name="spacing">16</property>
+										<property name="margin-top">24</property>
+										<property name="margin-bottom">24</property>
+										<property name="margin-start">24</property>
+										<property name="margin-end">24</property>
+										<property name="vexpand">True</property>
+										<child>
+											<object class="GtkLabel">
+												<property name="label">Open this URL on any device:</property>
+												<property name="wrap">True</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkLabel" id="lbl_oauth_url">
+												<property name="label">https://www.google.com/device</property>
+												<property name="selectable">True</property>
+												<style>
+													<class name="accent"/>
+												</style>
+											</object>
+										</child>
+										<child>
+											<object class="GtkLabel">
+												<property name="label">And enter this code:</property>
+												<property name="margin-top">8</property>
+											</object>
+										</child>
+										<child>
+											<object class="GtkLabel" id="lbl_oauth_code">
+												<property name="label">XXXX-XXXX</property>
+												<property name="selectable">True</property>
+												<style>
+													<class name="title-1"/>
+												</style>
+											</object>
+										</child>
+										<child>
+											<object class="GtkButton" id="btn_open_browser">
+												<signal name="clicked" handler="on_open_browser_clicked"/>
+												<property name="label">Open Browser</property>
+												<property name="margin-top">16</property>
+												<style>
+													<class name="suggested-action"/>
+													<class name="pill"/>
+												</style>
+											</object>
+										</child>
+										<child>
+											<object class="GtkButton" id="btn_oauth_cancel">
+												<signal name="clicked" handler="on_oauth_cancel_clicked"/>
+												<property name="label">Cancel</property>
+												<property name="margin-top">8</property>
+												<style>
+													<class name="pill"/>
+												</style>
+											</object>
+										</child>
+										<child>
+											<object class="GtkSpinner" id="oauth_spinner">
+												<property name="margin-top">16</property>
+											</object>
+										</child>
+									</object>
+								</property>
 							</object>
 						</child>
 					</object>

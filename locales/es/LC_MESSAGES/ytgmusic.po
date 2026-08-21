@@ -22,9 +22,9 @@ msgid "Error: "
 msgstr ""
 
 #: views/login.py:58
-msgid "Selecciona el canal que quieres utilizar:"
-msgstr ""
+msgid "Select the channel you want to use:"
+msgstr "Selecciona el canal que quieres utilizar:"
 
-#: views/sidebar.py:49 views/sidebar.py:52
-msgid "Conectado"
-msgstr ""
+#: views/sidebar.py:46 views/sidebar.py:49
+msgid "Connected"
+msgstr "Conectado"

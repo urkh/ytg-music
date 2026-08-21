@@ -4,7 +4,13 @@ from typing import Any, Optional
 
 from ytmusicapi import YTMusic
 
-from utils.auth import build_base_headers, extract_browser_cookies, get_auth_file_path
+from utils.auth import (
+    build_base_headers,
+    extract_browser_cookies,
+    get_auth_file_path,
+    get_oauth_credentials,
+    get_oauth_file_path,
+)
 from utils.logger import get_logger
 from utils.network import with_retries
 
@@ -18,8 +24,18 @@ class APIProxy:
 
     @classmethod
     def reload(cls) -> None:
+        oauth_path = get_oauth_file_path()
         headers_path = get_auth_file_path()
-        if os.path.exists(headers_path):
+
+        if os.path.exists(oauth_path):
+            try:
+                creds = get_oauth_credentials()
+                cls._instance = YTMusic(oauth_path, oauth_credentials=creds)
+                logger.info('YTMusic initialized with OAuth')
+            except Exception as e:
+                logger.error(f'Failed to load OAuth token: {e}')
+                cls._instance = YTMusic()
+        elif os.path.exists(headers_path):
             try:
                 # Refresh browser cookies silently
                 try:

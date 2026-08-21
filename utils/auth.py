@@ -1,16 +1,21 @@
 import json
 import os
 import tempfile
+import time
 import uuid
 
 import browsercookie
 from gi.repository import GLib
 from ytmusicapi import YTMusic
+from ytmusicapi.auth.oauth import OAuthCredentials
 from ytmusicapi.ytmusic import get_authorization, sapisid_from_cookie
 
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+OAUTH_CLIENT_ID = ''
+OAUTH_CLIENT_SECRET = ''
 
 
 def get_auth_file_path() -> str:
@@ -19,6 +24,18 @@ def get_auth_file_path() -> str:
     os.makedirs(data_dir, exist_ok=True)
     target_path = os.path.join(data_dir, 'headers_auth.json')
     return target_path
+
+
+def get_oauth_file_path() -> str:
+    """Returns the XDG Base Directory for saving OAuth session"""
+    data_dir = os.path.join(GLib.get_user_data_dir(), 'ytg-music')
+    os.makedirs(data_dir, exist_ok=True)
+    return os.path.join(data_dir, 'oauth.json')
+
+
+def get_oauth_credentials() -> OAuthCredentials:
+    """Instantiate OAuthCredentials using the configured ID and secret"""
+    return OAuthCredentials(OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
 
 def extract_browser_cookies() -> str:
@@ -92,7 +109,7 @@ def find_valid_accounts(base_headers: dict) -> list:
                     {
                         'auth_user': str(i),
                         'name': info['accountName'],
-                        'handle': info.get('channelHandle', f'Perfil {i}'),
+                        'handle': info.get('channelHandle', f'Profile {i}'),
                         'photo_url': info.get('accountPhotoUrl'),
                         'headers': headers,
                     }
@@ -107,3 +124,38 @@ def find_valid_accounts(base_headers: dict) -> list:
         raise Exception('Error: No valid YouTube Music channels were found or an authentication error occurred.')
 
     return valid_accounts
+
+
+def start_oauth_flow() -> dict:
+    """Initiates the OAuth device flow and returns code info"""
+    creds = get_oauth_credentials()
+    code_info = creds.get_code()
+    # returns dict with: device_code, user_code, verification_url, expires_in, interval
+    return code_info
+
+
+def poll_oauth_token(device_code: str) -> dict:
+    """Attempts to get the token. Returns the token dict if successful, or an error dict if pending"""
+    creds = get_oauth_credentials()
+    raw_token = creds.token_from_code(device_code)
+    return raw_token
+
+
+def is_authenticated() -> bool:
+    """Checks if either an OAuth session or headers session exists"""
+    return os.path.exists(get_oauth_file_path()) or os.path.exists(get_auth_file_path())
+
+
+def save_oauth_token(raw_token: dict) -> None:
+    """Saves the raw token to oauth.json in the format expected by ytmusicapi"""
+    token_dict = {
+        'access_token': raw_token['access_token'],
+        'refresh_token': raw_token['refresh_token'],
+        'scope': raw_token.get('scope', 'https://www.googleapis.com/auth/youtube'),
+        'token_type': raw_token.get('token_type', 'Bearer'),
+        'expires_in': raw_token.get('expires_in', 3600),
+        'expires_at': int(time.time()) + raw_token.get('expires_in', 3600),
+    }
+    target_path = get_oauth_file_path()
+    with open(target_path, 'w', encoding='utf-8') as f:
+        json.dump(token_dict, f, indent=2)

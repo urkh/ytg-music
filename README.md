@@ -31,7 +31,7 @@ A modern, native GTK4 / Libadwaita client for YouTube Music built with Python.
 - **Radio Mode / Infinite Autoplay**: Automatic recommendation queues (`radio=True`) when reaching the end of playlists or starting track radio.
 - **Track & Album Context Menus**: Secondary actions menu (right click / `...` button) for "Play next", "Add to queue", "Start radio", "Go to album/artist", and "Add to playlist".
 - **Search & Library Filters**: Filter chips for All, Songs, Albums, Artists, Playlists, and Videos, along with infinite scroll / pagination on demand.
-- **OAuth Device Flow Authentication**: Clean browser-independent login via `google.com/device` for sandboxed Flatpak/Snap environments.
+- **OAuth Device Flow Authentication**: Clean browser-independent login via `google.com/device` for sandboxed Flatpak/Snap environments *(Blocked upstream by YouTube changes, see [ytmusicapi #813](https://github.com/sigma67/ytmusicapi/issues/813))*.
 - **In-App Toast Notifications (`Adw.ToastOverlay`)**: Non-intrusive feedback toasts for actions like "Added to queue", "Subscribed", or network errors.
 - **Complete Internationalization (i18n)**: Comprehensive localization support and complete translation coverage across all UI views and dialogs.
 
