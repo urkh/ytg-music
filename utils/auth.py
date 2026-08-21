@@ -39,12 +39,7 @@ def get_oauth_credentials() -> OAuthCredentials:
 
 
 def extract_browser_cookies() -> str:
-    """Extracts and filters essential YouTube cookies from the local browser"""
-    try:
-        cj = browsercookie.firefox()
-    except Exception:
-        cj = browsercookie.chrome()
-
+    """Extracts and filters essential YouTube cookies from local browsers (Firefox, Chrome, Chromium, Brave, etc.)"""
     essential_keys = [
         '__Secure-1PSID',
         '__Secure-3PSID',
@@ -62,14 +57,32 @@ def extract_browser_cookies() -> str:
         'VISITOR_INFO1_LIVE',
     ]
 
-    filtered = [f'{c.name}={c.value}' for c in cj if 'youtube.com' in c.domain and c.name in essential_keys]
+    browser_loaders = [
+        ('Firefox', browsercookie.firefox),
+        ('Chrome', browsercookie.chrome),
+        ('Chromium', browsercookie.chromium),
+        ('Brave', browsercookie.brave),
+        ('Edge', browsercookie.edge),
+        ('Vivaldi', browsercookie.vivaldi),
+    ]
 
-    if not filtered:
-        raise Exception(
-            'Error: The browser cookies are not present or are expired. Please, log in to YouTube Music and try again.'
-        )
+    for name, loader in browser_loaders:
+        try:
+            cj = loader()
+            filtered = [
+                f'{c.name}={c.value}'
+                for c in cj
+                if 'youtube.com' in c.domain and c.name in essential_keys
+            ]
+            if filtered:
+                logger.info(f'Successfully extracted YouTube cookies from {name}')
+                return '; '.join(filtered)
+        except Exception as e:
+            logger.debug(f'Could not load cookies from {name}: {e}')
 
-    return '; '.join(filtered)
+    raise Exception(
+        'Error: The browser cookies are not present or are expired. Please, log in to YouTube Music and try again.'
+    )
 
 
 def build_base_headers(cookie_str: str) -> dict:

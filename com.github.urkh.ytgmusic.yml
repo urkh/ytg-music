@@ -1,6 +1,6 @@
 app-id: com.github.urkh.ytgmusic
 runtime: org.gnome.Platform
-runtime-version: '47'
+runtime-version: '49'
 sdk: org.gnome.Sdk
 command: ytgmusic
 
@@ -11,6 +11,8 @@ finish-args:
   - --share=network
   - --socket=pulseaudio
   - --own-name=org.mpris.MediaPlayer2.ytgmusic
+  - --talk-name=org.freedesktop.secrets
+  - --filesystem=home:ro
 
 modules:
   - name: ytgmusic
