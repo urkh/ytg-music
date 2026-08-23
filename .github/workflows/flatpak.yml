@@ -29,7 +29,8 @@ jobs:
             libglib2.0-dev \
             gobject-introspection \
             libcairo2-dev \
-            pkg-config
+            pkg-config \
+            xvfb
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
@@ -41,7 +42,7 @@ jobs:
         run: uv run ruff check .
 
       - name: Run Unit Tests
-        run: uv run pytest
+        run: xvfb-run -a uv run pytest
 
   flatpak:
     name: "Flatpak Build"

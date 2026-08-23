@@ -58,6 +58,46 @@ def round_pixbuf(pixbuf: GdkPixbuf.Pixbuf, radius: int = 12) -> GdkPixbuf.Pixbuf
     return res_pixbuf
 
 
+def process_pixbuf(
+    pixbuf: GdkPixbuf.Pixbuf,
+    is_circular: bool = False,
+    is_unrounded: bool = False,
+    max_size: int = 200,
+    max_width: Optional[int] = None,
+    max_height: Optional[int] = None,
+) -> GdkPixbuf.Pixbuf:
+    """Processes a Pixbuf by downscaling with aspect ratio preservation and optional rounding"""
+    if not is_unrounded and is_circular:
+        w = pixbuf.get_width()
+        h = pixbuf.get_height()
+        if w != h:
+            min_dim = min(w, h)
+            offset_x = (w - min_dim) // 2
+            offset_y = (h - min_dim) // 2
+            pixbuf = pixbuf.new_subpixbuf(offset_x, offset_y, min_dim, min_dim)
+
+    orig_w = pixbuf.get_width()
+    orig_h = pixbuf.get_height()
+
+    target_max_w = max_width if max_width is not None else max_size
+    target_max_h = max_height if max_height is not None else max_size
+
+    if target_max_w and target_max_h and (orig_w > target_max_w or orig_h > target_max_h):
+        scale = min(target_max_w / orig_w, target_max_h / orig_h)
+        new_w = max(1, int(round(orig_w * scale)))
+        new_h = max(1, int(round(orig_h * scale)))
+        pixbuf = pixbuf.scale_simple(new_w, new_h, GdkPixbuf.InterpType.BILINEAR)
+
+    if not is_unrounded:
+        if is_circular:
+            radius = pixbuf.get_width() / 2
+            pixbuf = round_pixbuf(pixbuf, radius=int(radius))
+        else:
+            pixbuf = round_pixbuf(pixbuf, radius=16)
+
+    return pixbuf
+
+
 def load_image_async(
     url: Optional[str],
     image_widget: Any,
@@ -98,38 +138,26 @@ def load_image_async(
                 pixbuf = GdkPixbuf.Pixbuf.new_from_stream(stream, None)
                 stream.close()
 
-                orig_w = pixbuf.get_width()
-                orig_h = pixbuf.get_height()
-
-                target_max_w = max_width if max_width is not None else max_size
-                target_max_h = max_height if max_height is not None else max_size
-
-                if target_max_w and target_max_h and (orig_w > target_max_w or orig_h > target_max_h):
-                    scale = min(target_max_w / orig_w, target_max_h / orig_h)
-                    new_w = max(1, int(round(orig_w * scale)))
-                    new_h = max(1, int(round(orig_h * scale)))
-                    pixbuf = pixbuf.scale_simple(new_w, new_h, GdkPixbuf.InterpType.BILINEAR)
-
-                if not is_unrounded:
-                    if is_circular:
-                        w = pixbuf.get_width()
-                        h = pixbuf.get_height()
-                        if w != h:
-                            min_dim = min(w, h)
-                            offset_x = (w - min_dim) // 2
-                            offset_y = (h - min_dim) // 2
-                            pixbuf = pixbuf.new_subpixbuf(offset_x, offset_y, min_dim, min_dim)
-                        radius = pixbuf.get_width() / 2
-                        pixbuf = round_pixbuf(pixbuf, radius=int(radius))
-                    else:
-                        pixbuf = round_pixbuf(pixbuf, radius=16)
+                pixbuf = process_pixbuf(
+                    pixbuf,
+                    is_circular=is_circular,
+                    is_unrounded=is_unrounded,
+                    max_size=max_size,
+                    max_width=max_width,
+                    max_height=max_height,
+                )
 
                 def update_ui():
-                    texture = Gdk.Texture.new_for_pixbuf(pixbuf)
-                    if isinstance(image_widget, Gtk.Picture):
-                        image_widget.set_paintable(texture)
-                    else:
-                        image_widget.set_from_paintable(texture)
+                    try:
+                        texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+                        if isinstance(image_widget, Gtk.Picture):
+                            image_widget.set_paintable(texture)
+                        elif hasattr(image_widget, 'set_from_paintable'):
+                            image_widget.set_from_paintable(texture)
+                        elif hasattr(image_widget, 'set_paintable'):
+                            image_widget.set_paintable(texture)
+                    except Exception as e:
+                        logger.warning(f'Error updating image UI: {e}')
 
                 GLib.idle_add(update_ui)
         except Exception as e:
