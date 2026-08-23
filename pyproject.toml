@@ -1,6 +1,6 @@
 [project]
 name = "ytg-music"
-version = "0.0.3"
+version = "0.0.4"
 description = "Native GTK4/Libadwaita desktop client for YouTube Music"
 readme = "README.md"
 requires-python = ">=3.11"
