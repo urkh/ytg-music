@@ -183,7 +183,7 @@ class ArtistDetail(BaseModel):
     def display_subscribers(self) -> str:
         if self.subscribers:
             subs = self.subscribers.lower().replace('subscribers', '').replace('suscriptores', '').strip().upper()
-            return f'Público mensual: {subs} usuarios'
+            return f'Monthly listeners: {subs} users'
         return ''
 
     @property
