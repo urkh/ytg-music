@@ -21,6 +21,8 @@
 									<object class="GtkPicture" id="img_cover">
 										<property name="can-shrink">True</property>
 										<property name="content-fit">cover</property>
+										<property name="hexpand">True</property>
+										<property name="vexpand">True</property>
 									</object>
 								</property>
 								<child type="overlay">

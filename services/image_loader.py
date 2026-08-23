@@ -36,13 +36,16 @@ def round_pixbuf(pixbuf: GdkPixbuf.Pixbuf, radius: int = 12) -> GdkPixbuf.Pixbuf
     width = pixbuf.get_width()
     height = pixbuf.get_height()
 
+    max_radius = min(width, height) / 2
+    actual_radius = min(float(radius), max_radius)
+
     surface = cairo.ImageSurface(cairo.Format.ARGB32, width, height)
     cr = cairo.Context(surface)
 
-    cr.arc(radius, radius, radius, math.pi, 1.5 * math.pi)
-    cr.arc(width - radius, radius, radius, 1.5 * math.pi, 2 * math.pi)
-    cr.arc(width - radius, height - radius, radius, 0, 0.5 * math.pi)
-    cr.arc(radius, height - radius, radius, 0.5 * math.pi, math.pi)
+    cr.arc(actual_radius, actual_radius, actual_radius, math.pi, 1.5 * math.pi)
+    cr.arc(width - actual_radius, actual_radius, actual_radius, 1.5 * math.pi, 2 * math.pi)
+    cr.arc(width - actual_radius, height - actual_radius, actual_radius, 0, 0.5 * math.pi)
+    cr.arc(actual_radius, height - actual_radius, actual_radius, 0.5 * math.pi, math.pi)
     cr.close_path()
 
     cr.clip()
@@ -61,8 +64,10 @@ def load_image_async(
     is_circular: bool = False,
     is_unrounded: bool = False,
     max_size: int = 200,
+    max_width: Optional[int] = None,
+    max_height: Optional[int] = None,
 ) -> None:
-    """Downloads an image and processes it with downscaling"""
+    """Downloads an image and processes it with aspect-ratio-preserving downscaling"""
     if not url:
         return
 
@@ -93,13 +98,29 @@ def load_image_async(
                 pixbuf = GdkPixbuf.Pixbuf.new_from_stream(stream, None)
                 stream.close()
 
-                if pixbuf.get_width() > max_size or pixbuf.get_height() > max_size:
-                    pixbuf = pixbuf.scale_simple(max_size, max_size, GdkPixbuf.InterpType.BILINEAR)
+                orig_w = pixbuf.get_width()
+                orig_h = pixbuf.get_height()
+
+                target_max_w = max_width if max_width is not None else max_size
+                target_max_h = max_height if max_height is not None else max_size
+
+                if target_max_w and target_max_h and (orig_w > target_max_w or orig_h > target_max_h):
+                    scale = min(target_max_w / orig_w, target_max_h / orig_h)
+                    new_w = max(1, int(round(orig_w * scale)))
+                    new_h = max(1, int(round(orig_h * scale)))
+                    pixbuf = pixbuf.scale_simple(new_w, new_h, GdkPixbuf.InterpType.BILINEAR)
 
                 if not is_unrounded:
                     if is_circular:
-                        radius = min(pixbuf.get_width(), pixbuf.get_height()) / 2
-                        pixbuf = round_pixbuf(pixbuf, radius=radius)
+                        w = pixbuf.get_width()
+                        h = pixbuf.get_height()
+                        if w != h:
+                            min_dim = min(w, h)
+                            offset_x = (w - min_dim) // 2
+                            offset_y = (h - min_dim) // 2
+                            pixbuf = pixbuf.new_subpixbuf(offset_x, offset_y, min_dim, min_dim)
+                        radius = pixbuf.get_width() / 2
+                        pixbuf = round_pixbuf(pixbuf, radius=int(radius))
                     else:
                         pixbuf = round_pixbuf(pixbuf, radius=16)
 

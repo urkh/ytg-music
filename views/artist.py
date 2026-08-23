@@ -179,7 +179,7 @@ class ArtistView(Gtk.Overlay):
     def _set_cover_image(self, url: str):
         self.img_cover.set_paintable(None)
         if url:
-            load_image_async(url, self.img_cover, is_unrounded=True)
+            load_image_async(url, self.img_cover, is_unrounded=True, max_size=1920)
 
     def _render_songs(self, songs: dict):
         self.songs_data = songs
@@ -218,6 +218,7 @@ class ArtistView(Gtk.Overlay):
         update_active_list_row(self.list_top_songs, player_service.current_video_id)
 
     def clear_view(self):
+        self.img_cover.set_paintable(None)
         self.content_box.set_visible(False)
         self.song_items = []
         self.songs_data = {}

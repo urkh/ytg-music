@@ -3,7 +3,7 @@
 }
 
 .artist-header-gradient {
-    background: linear-gradient(to bottom, transparent 0%, @window_bg_color 90%, @window_bg_color 100%);
+    background: linear-gradient(to bottom, transparent 0%, alpha(@window_bg_color, 0.4) 40%, alpha(@window_bg_color, 0.85) 80%, @window_bg_color 100%);
 }
 
 .sidebar-border {

@@ -34,6 +34,16 @@ class LibrarySection(BaseModel):
     force_type: str = ''
 
 
+def get_best_thumbnail_url(thumbnails: Optional[List[Dict[str, Any]]]) -> Optional[str]:
+    if not thumbnails or not isinstance(thumbnails, list):
+        return None
+    valid_thumbs = [t for t in thumbnails if isinstance(t, dict) and t.get('url')]
+    if not valid_thumbs:
+        return None
+    sorted_thumbs = sorted(valid_thumbs, key=lambda t: (t.get('width', 0) or 0) * (t.get('height', 0) or 0))
+    return sorted_thumbs[-1].get('url')
+
+
 class MediaItem(BaseModel):
     """
     Model that validates raw ytmusicapi response dictionaries
@@ -59,9 +69,7 @@ class MediaItem(BaseModel):
 
     @property
     def best_thumbnail_url(self) -> Optional[str]:
-        if not self.thumbnails or not isinstance(self.thumbnails, list):
-            return None
-        return self.thumbnails[-1].get('url')
+        return get_best_thumbnail_url(self.thumbnails)
 
     @property
     def display_subtitle(self) -> str:
@@ -188,9 +196,7 @@ class ArtistDetail(BaseModel):
 
     @property
     def best_thumbnail_url(self) -> Optional[str]:
-        if not self.thumbnails or not isinstance(self.thumbnails, list):
-            return None
-        return self.thumbnails[-1].get('url')
+        return get_best_thumbnail_url(self.thumbnails)
 
 
 class AlbumDetail(BaseModel):
@@ -218,9 +224,7 @@ class AlbumDetail(BaseModel):
 
     @property
     def best_thumbnail_url(self) -> Optional[str]:
-        if not self.thumbnails or not isinstance(self.thumbnails, list):
-            return None
-        return self.thumbnails[-1].get('url')
+        return get_best_thumbnail_url(self.thumbnails)
 
     def get_queue_tracks(self, album_id: str) -> List[Dict[str, Any]]:
         queue = []

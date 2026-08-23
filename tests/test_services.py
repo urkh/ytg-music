@@ -59,6 +59,76 @@ def test_image_loader_disk_only_no_ram():
     assert image_loader._image_executor._max_workers == 4
 
 
+def test_round_pixbuf():
+    from gi.repository import GdkPixbuf
+
+    # Test round_pixbuf on landscape pixbuf (300x100)
+    pb = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 300, 100)
+    rounded = image_loader.round_pixbuf(pb, radius=16)
+    assert rounded.get_width() == 300
+    assert rounded.get_height() == 100
+
+    # Test round_pixbuf with radius larger than dimensions (should clamp safely)
+    pb_small = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 20, 10)
+    rounded_small = image_loader.round_pixbuf(pb_small, radius=50)
+    assert rounded_small.get_width() == 20
+    assert rounded_small.get_height() == 10
+
+
+def test_best_thumbnail_selection():
+    from models.media import AlbumDetail, ArtistDetail, MediaItem, get_best_thumbnail_url
+
+    thumbnails = [
+        {'url': 'https://example.com/small.jpg', 'width': 540, 'height': 225},
+        {'url': 'https://example.com/huge.jpg', 'width': 2880, 'height': 1200},
+        {'url': 'https://example.com/medium.jpg', 'width': 816, 'height': 340},
+    ]
+
+    assert get_best_thumbnail_url(thumbnails) == 'https://example.com/huge.jpg'
+
+    artist = ArtistDetail(name='Test Artist', thumbnails=thumbnails)
+    assert artist.best_thumbnail_url == 'https://example.com/huge.jpg'
+
+    album = AlbumDetail(title='Test Album', thumbnails=thumbnails)
+    assert album.best_thumbnail_url == 'https://example.com/huge.jpg'
+
+    media = MediaItem(title='Test Song', thumbnails=thumbnails)
+    assert media.best_thumbnail_url == 'https://example.com/huge.jpg'
+
+    # Empty / None handling
+    assert get_best_thumbnail_url([]) is None
+    assert get_best_thumbnail_url(None) is None
+
+
+def test_load_image_async_preserves_aspect_ratio(mocker):
+    import time
+
+    from gi.repository import GdkPixbuf, GLib, Gtk
+
+    pb = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 2400, 1000)
+    success, buffer = pb.save_to_bufferv('png', [], [])
+    mock_resp = mocker.MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.content = bytes(buffer)
+
+    mocker.patch('services.image_loader.requests.get', return_value=mock_resp)
+
+    pic = Gtk.Picture()
+    image_loader.load_image_async('https://fake.url/test_landscape.png', pic, is_unrounded=True, max_size=1200)
+
+    ctx = GLib.MainContext.default()
+    for _ in range(50):
+        ctx.iteration(False)
+        if pic.get_paintable() is not None:
+            break
+        time.sleep(0.02)
+
+    paintable = pic.get_paintable()
+    assert paintable is not None
+    assert paintable.get_intrinsic_width() == 1200
+    assert paintable.get_intrinsic_height() == 500
+
+
 def test_worker_bounded_thread_pool():
     # Verify bounded thread pool for general worker tasks
     assert isinstance(worker._executor, ThreadPoolExecutor)
