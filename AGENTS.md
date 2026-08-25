@@ -122,9 +122,13 @@ ytg-music/
 - GStreamer `playbin` is used for audio output. Listen to player signals (`song-changed`, `state-changed`, `position-changed`, `queue-changed`, etc.) rather than querying state manually.
 - Stream resolution uses `pytubefix` with automatic retries via `@with_retries`. Extraction failures must be caught gracefully without crashing the queue.
 
+### 3.6. Simplicity & Minimal Surface Area
+
+- Fixes should make the system simpler, not more complex. Prefer removing or consolidating code over adding a new layer, flag, or special case. If a fix grows the system's surface area, look for the version that shrinks it.
+
 ---
 
-## 4. Coding Style & Linting Standards
+## 4. Coding Style & Zero-Comments Standard
 
 - **Linter & Formatter**: `ruff`
 - **Line Length**: 120 characters
@@ -133,7 +137,7 @@ ytg-music/
   ```toml
   known-first-party = ["models", "services", "utils", "views", "ui"]
   ```
-- **Docstrings & Comments**: Preserve all existing docstrings and comments. Write clean docstrings for new public methods and helpers.
+- **Zero-Comments Standard**: Never leave comments in the repo. The standard is zero comments: no explanatory comments or docblocks, TODO/FIXME notes, lint/type suppression directives, or commented-out code. Express intent through names, structure, and tests; put rationale in commit messages or PR descriptions. Interpreter shebangs are executable directives, not comments.
 
 ---
 
